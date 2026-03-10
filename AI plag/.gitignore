@@ -1,0 +1,7 @@
+# Chặn file môi trường chứa Key
+.env
+# Chặn thư mục rác Python
+__pycache__/
+*.pyc
+# Chặn các file cấu hình NetBeans/Java nhạy cảm
+nbproject/private/
