@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
 from docx import Document
-import fitz  # PyMuPDF
+import fitz  
 from duckduckgo_search import DDGS
 import os
 from dotenv import load_dotenv
@@ -47,7 +47,7 @@ class TopicRelevanceRequest(BaseModel):
     
 print("--- Hệ thống Plagiarism Hybrid PRO  - FPT University Edition ---")
 
-# --- HÀM BỔ TRỢ ---
+
 def get_content_from_url(url: str, timeout=7):
     """Cào dữ liệu với timeout ngắn để tránh treo hệ thống"""
     try:
@@ -104,16 +104,16 @@ async def check_plagiarism_auto(request: ThesisRequest):
     if word_count < 30:
         return {"similarity_score": 0.0, "status": "An toàn", "best_source": "N/A", "analysis": "Văn bản quá ngắn."}
 
-    # [BƯỚC 2] TÌM KIẾM - Mở rộng query để tìm đúng nguồn gốc
+    
     print(f"[BƯỚC 2] Đang tìm kiếm nguồn nghi vấn...")
     clean_words = re.sub(r'[^\w\s]', ' ', thesis_text).split()
-    # Lấy đoạn văn dài hơn (từ từ 10 đến 60) để tìm chính xác hơn
+    
     query = " ".join(clean_words[10:60]) 
     
     found_urls = []
     try:
         with DDGS() as ddgs:
-            # Tăng lên 10 kết quả để không bỏ sót nguồn quan trọng
+           
             results = ddgs.text(query, region='vi-vnm', max_results=10) 
             found_urls = [r['href'] for r in results if "localhost" not in r['href']]
     except Exception as e:
@@ -122,7 +122,7 @@ async def check_plagiarism_auto(request: ThesisRequest):
     if not found_urls:
         return {"similarity_score": 0.0, "status": "An toàn", "best_source": "N/A"}
 
-    # [BƯỚC 3] SÀNG LỌC BẰNG EMBEDDING
+    
     print(f"[BƯỚC 3] Đang quét {len(found_urls)} website...")
     thesis_sentences = split_into_sentences(thesis_text)
     thesis_vecs = np.array(embed_texts_batch(thesis_sentences))
@@ -140,7 +140,7 @@ async def check_plagiarism_auto(request: ThesisRequest):
         norms = np.linalg.norm(thesis_vecs, axis=1, keepdims=True) * np.linalg.norm(src_vecs, axis=1, keepdims=True).T
         sim_matrix = sim_matrix / (norms + 1e-9)
 
-        # HẠ NGƯỠNG XUỐNG 0.70 ĐỂ KHÔNG BỎ SÓT NGUỒN XÀO NẤU
+       
         max_sim = np.max(sim_matrix)
         coverage = np.mean(np.max(sim_matrix, axis=1) > 0.70) 
         
@@ -149,11 +149,11 @@ async def check_plagiarism_auto(request: ThesisRequest):
     if not source_rankings:
         return {"similarity_score": 0.0, "status": "An toàn", "best_source": "N/A"}
 
-    # Chọn nguồn có độ bao phủ (coverage) cao nhất
+    
     best_match = max(source_rankings, key=lambda x: x["coverage"])
 
-# [BƯỚC 4] THẨM ĐỊNH BẰNG GPT-4O-MINI
-    print(f"[BƯỚC 4] GPT-4o-mini đang thẩm định cực gắt...")
+
+    print(f"[BƯỚC 4] Sentence embedding models đang thẩm định ...")
     try:
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -174,7 +174,7 @@ async def check_plagiarism_auto(request: ThesisRequest):
         )
         res = json.loads(response.choices[0].message.content)
         final_score = res.get('similarity_score', 0)
-        ai_reason = res.get('reason', 'Không có lý do cụ thể.') # Lấy cách suy luận của AI
+        ai_reason = res.get('reason', 'Không có lý do cụ thể.') 
         
         status = "An toàn"
         if final_score > 70: status = "Nguy cơ đạo văn cao"
@@ -201,12 +201,12 @@ async def check_plagiarism_auto(request: ThesisRequest):
 async def check_topic_relevance(request: TopicRelevanceRequest):
     print(f"\n[KIỂM TRA LẠC ĐỀ] Đang xử lý đề tài: {request.topic_title}")
     
-    # Lấy nội dung tài liệu
+    
     doc_text = get_content_from_url(request.report_url)
     if not doc_text or len(doc_text) < 100:
         return {"relevance_score": 0.0, "is_on_topic": False, "analysis": "Tài liệu trống hoặc quá ngắn."}
 
-    # Lấy 2000 ký tự đầu để AI thẩm định (thường phần đầu chứa mục tiêu và giới thiệu)
+    
     content_to_analyze = doc_text[:2000]
 
     try:
