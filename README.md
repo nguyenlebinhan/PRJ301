@@ -28,8 +28,6 @@ The PRJ301 Thesis Management System is a web-based application designed to facil
 
 ## 🖥️ Screenshots
 
-![Screenshot 1](path-to-screenshot-of-login-page) <!-- TODO: Add actual screenshots (e.g., Login, Dashboard, Thesis List, Submission Form) -->
-![Screenshot 2](path-to-screenshot-of-dashboard) <!-- TODO: Add actual screenshots -->
 
 ## 🛠️ Tech Stack
 
