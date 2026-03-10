@@ -11,9 +11,6 @@
 
 **A comprehensive web application to streamline the thesis management process for students and faculty.**
 
-[Live Demo](https://demo-link.com) <!-- TODO: Add live demo link --> |
-[Documentation](https://docs-link.com) <!-- TODO: Add documentation link -->
-
 </div>
 
 ## 📖 Overview
