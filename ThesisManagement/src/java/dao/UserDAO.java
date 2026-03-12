@@ -1,6 +1,7 @@
 package dao;
 
 import dal.DBContext;
+import dto.AdminInformationRequest;
 import model.User;
 import java.sql.*;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class UserDAO {
     public UserDAO() {
         this.dbContext = new DBContext();
     }
-
+    
     public User login(String username, String password) {
         LOGGER.log(Level.INFO, "Attempting login for username: {0}", username);
         
@@ -49,7 +50,7 @@ public class UserDAO {
         }
         return null;
     }
-
+    
     public User getUserById(int id) {
         LOGGER.log(Level.INFO, "Getting user by id: {0}", id);
         
@@ -105,7 +106,8 @@ public class UserDAO {
         }
         return null;
     }
-
+    
+    
     public User getUserByEmail(String email) {
         LOGGER.log(Level.INFO, "Getting user by email: {0}", email);
         
@@ -156,6 +158,65 @@ public class UserDAO {
         }
         return users;
     }
+    
+    public List<AdminInformationRequest> getAllInformation() {
+        LOGGER.log(Level.INFO, "Getting all users");
+        
+        List<AdminInformationRequest> infos = new ArrayList<>();
+        String sql = "select u.*,l.mscv,l.academicTitle,l.researchField,s.mssv,s.className,s.major,s.gpa,s.skills,s.phone from Users u left join Students s on u.id=s.userId left join Lecturers l on l.userId=u.id ";
+        
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                AdminInformationRequest info =new AdminInformationRequest();
+                info.setId(rs.getInt("id"));
+                info.setUsername(rs.getString("username"));
+                info.setPassword(rs.getString("password"));
+                info.setEmail(rs.getString("email"));
+                info.setFullName(rs.getNString("fullName"));
+                info.setRole(rs.getString("role"));
+                info.setCreatedAt(rs.getTimestamp("createdAt"));
+                info.setIsActive(rs.getBoolean("isActive"));
+                if(rs.getString("mscv") != null){
+                    info.setMscv(rs.getString("mscv"));
+                }
+                if(rs.getNString("academicTitle") != null){
+                    info.setAcademicTitle(rs.getNString("academicTitle"));
+                }
+                if(rs.getNString("researchField") != null){
+                    info.setResearchField(rs.getNString("researchField"));
+                }
+                if(rs.getString("mssv") != null){
+                    info.setMssv(rs.getString("mssv"));
+                }
+                if(rs.getNString("className") != null){
+                    info.setClassName(rs.getNString("className"));
+                }
+                if(rs.getNString("major") != null){
+                    info.setMajor(rs.getNString("major"));
+                }
+                if(rs.getBigDecimal("gpa") != null){
+                    info.setGpa(rs.getBigDecimal("gpa"));
+                }
+                if(rs.getNString("skills") != null){
+                    info.setSkills(rs.getNString("skills"));
+                }                
+                if(rs.getString("phone") != null){
+                    info.setPhone(rs.getString("phone"));
+                }
+                
+                infos.add(info);
+            }
+            LOGGER.log(Level.INFO, "Retrieved {0} users", infos.size());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting all users", e);
+        }
+        return infos;
+    }    
+    
+    
 
     public boolean createUser(User user) {
         LOGGER.log(Level.INFO, "Creating new user: username={0}, email={1}, roleId={2}", 
@@ -239,6 +300,29 @@ public class UserDAO {
             return false;
         }
     }
+    public boolean deactivateUser(int userId) {
+        LOGGER.log(Level.INFO, "Dectivate user id: {0}", userId);
+        
+        String sql = "UPDATE Users SET isActive = 0 WHERE id = ?";
+        
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, userId);
+            
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                LOGGER.log(Level.INFO, "Dectivate successfully for user id: {0}", userId);
+                return true;
+            } else {
+                LOGGER.log(Level.WARNING, "Dectivate failed: no rows affected for user id: {0}", userId);
+                return false;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error deactivating user id: " + userId, e);
+            return false;
+        }
+    }    
     
     public boolean deleteUser(int userId){
         LOGGER.log(Level.INFO,"Delete user with user id: {0}",userId);

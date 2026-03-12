@@ -18,6 +18,7 @@ public class RegisterRequest {
     private String mssv;
     private String className;
     private String major;
+    private String phone;
     private String mscv;
     private String academicTitle;
     private String researchField;
@@ -25,7 +26,7 @@ public class RegisterRequest {
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String password, String confirmPassword, String email, String fullName, String role, String mssv, String className, String major, String mscv, String academicTitle, String researchField) {
+    public RegisterRequest(String username, String password, String confirmPassword, String email, String fullName, String role, String mssv, String className, String major, String phone, String mscv, String academicTitle, String researchField) {
         this.username = username;
         this.password = password;
         this.confirmPassword = confirmPassword;
@@ -35,10 +36,13 @@ public class RegisterRequest {
         this.mssv = mssv;
         this.className = className;
         this.major = major;
+        this.phone = phone;
         this.mscv = mscv;
         this.academicTitle = academicTitle;
         this.researchField = researchField;
     }
+
+
     
     
 
@@ -136,6 +140,14 @@ public class RegisterRequest {
 
     public void setResearchField(String researchField) {
         this.researchField = researchField;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
     
     

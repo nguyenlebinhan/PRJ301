@@ -29,11 +29,11 @@ public class AuthFilter implements Filter {
         HttpSession session = httpRequest.getSession(false);
         String requestURI = httpRequest.getRequestURI();
         
-        // Allow access to login page, some password recovery source and static resources
+        
 
         if (requestURI.contains("/login") || 
-            requestURI.contains("/forget-password") || // Trang nhập email
-            requestURI.contains("/reset-password") ||  // Trang đặt lại mật khẩu mới
+            requestURI.contains("/forget-password") || 
+            requestURI.contains("/reset-password") ||  
             requestURI.contains("/css/") || 
             requestURI.contains("/js/") || 
             requestURI.contains("/images/")) {
@@ -42,13 +42,13 @@ public class AuthFilter implements Filter {
             return;
         }
         
-        // Check if user is not logged in
+        
         if (session == null || session.getAttribute("user") == null) {
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/auth/login");
             return;
         }
         
-        // Check authorization based on role
+        
         String role = (String) session.getAttribute("role");
         if (role != null) {
             if (requestURI.contains("/admin") && !role.equals("ADMIN")) {

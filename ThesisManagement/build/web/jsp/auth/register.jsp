@@ -126,7 +126,7 @@
                 <div class="success">${success}</div>
             </c:if>              
             <h2>Đăng ký tài khoản</h2>
-            <form method="POST" action="${pageContext.request.contextPath}/auth/register">
+            <form method="POST" action="${pageContext.request.contextPath}/auth/register" accept-charset="UTF-8">
                 <div class="form-group">
                     <label for="username">Tên đăng nhập *:</label>
                     <input type="text" id="username" name="username" required minlength="3" 
@@ -173,6 +173,11 @@
                         <input type="text" id="mssv" name="mssv" 
                                value="${registerRequest != null ? registerRequest.mssv : ''}">
                     </div>
+                    <div class="form-group">
+                        <label for="mssv">Số điện thoại :</label>
+                        <input type="text" id="phone" name="phone" 
+                               value="${registerRequest != null ? registerRequest.phone : ''}">
+                    </div>                    
                     <div class="row">
                         <div class="form-group">
                             <label for="className">Lớp:</label>

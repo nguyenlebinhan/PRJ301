@@ -7,6 +7,8 @@ import dao.ThesisHistoryDAO;
 import dao.TopicDAO;
 import dao.TopicRegistrationDAO;
 import dao.UserDAO;
+import dto.AddingUserRequest;
+import dto.AdminInformationRequest;
 import dto.RegisterRequest;
 
 import model.User;
@@ -99,6 +101,7 @@ public class AdminController extends HttpServlet {
                     break;
                 case "/addUser":
                     addUser(request,response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -138,55 +141,54 @@ public class AdminController extends HttpServlet {
         });
         LOGGER.log(Level.INFO, "=== END PARAMETERS ===");
         
-        RegisterRequest registerRequest = new RegisterRequest();
-        registerRequest.setUsername(request.getParameter("username"));
-        registerRequest.setPassword(request.getParameter("password"));
-        registerRequest.setConfirmPassword(request.getParameter("confirmPassword"));
-        registerRequest.setEmail(request.getParameter("email"));
-        registerRequest.setFullName(request.getParameter("fullName"));
-        registerRequest.setRole(request.getParameter("role"));
+        AddingUserRequest addingUserRequest = new AddingUserRequest();
+        addingUserRequest.setFullName(request.getParameter("fullName"));        
+        addingUserRequest.setUsername(request.getParameter("username"));
+        addingUserRequest.setEmail(request.getParameter("email"));
+        
+        addingUserRequest.setPassword(request.getParameter("password"));
+        addingUserRequest.setRole(request.getParameter("role"));
         
         // BUG FIX: Set MSSV and MSCV BEFORE validation
-        registerRequest.setMssv(request.getParameter("mssv"));
-        registerRequest.setClassName(request.getParameter("className"));
-        registerRequest.setMajor(request.getParameter("major"));
-        registerRequest.setMscv(request.getParameter("mscv"));
-        registerRequest.setAcademicTitle(request.getParameter("academicTitle"));
-        registerRequest.setResearchField(request.getParameter("researchField"));
+        addingUserRequest.setMssv(request.getParameter("mssv"));
+        addingUserRequest.setClassName(request.getParameter("className"));
+        addingUserRequest.setMajor(request.getParameter("major"));
+        addingUserRequest.setMscv(request.getParameter("mscv"));
+        addingUserRequest.setAcademicTitle(request.getParameter("academicTitle"));
+        addingUserRequest.setResearchField(request.getParameter("researchField"));
         
         LOGGER.log(Level.INFO, "=== REGISTER REQUEST DATA ===");
-        LOGGER.log(Level.INFO, "Username: {0}", registerRequest.getUsername());
-        LOGGER.log(Level.INFO, "Email: {0}", registerRequest.getEmail());
-        LOGGER.log(Level.INFO, "FullName: {0}", registerRequest.getFullName());
-        LOGGER.log(Level.INFO, "Role: {0}", registerRequest.getRole());
-        LOGGER.log(Level.INFO, "MSSV: {0}", registerRequest.getMssv());
-        LOGGER.log(Level.INFO, "ClassName: {0}", registerRequest.getClassName());
-        LOGGER.log(Level.INFO, "Major: {0}", registerRequest.getMajor());
-        LOGGER.log(Level.INFO, "MSCV: {0}", registerRequest.getMscv());
-        LOGGER.log(Level.INFO, "AcademicTitle: {0}", registerRequest.getAcademicTitle());
-        LOGGER.log(Level.INFO, "ResearchField: {0}", registerRequest.getResearchField());
+        LOGGER.log(Level.INFO, "Username: {0}", addingUserRequest.getUsername());
+        LOGGER.log(Level.INFO, "Email: {0}", addingUserRequest.getEmail());
+        LOGGER.log(Level.INFO, "FullName: {0}", addingUserRequest.getFullName());
+        LOGGER.log(Level.INFO, "Role: {0}", addingUserRequest.getRole());
+        LOGGER.log(Level.INFO, "MSSV: {0}", addingUserRequest.getMssv());
+        LOGGER.log(Level.INFO, "ClassName: {0}", addingUserRequest.getClassName());
+        LOGGER.log(Level.INFO, "Major: {0}", addingUserRequest.getMajor());
+        LOGGER.log(Level.INFO, "MSCV: {0}", addingUserRequest.getMscv());
+        LOGGER.log(Level.INFO, "AcademicTitle: {0}", addingUserRequest.getAcademicTitle());
+        LOGGER.log(Level.INFO, "ResearchField: {0}", addingUserRequest.getResearchField());
         LOGGER.log(Level.INFO, "=== END REGISTER REQUEST DATA ===");
         
         // Validate input
         LOGGER.log(Level.INFO, "Starting validation...");
-        String error = validateRegisterRequest(registerRequest);
+        String error = validateAddingUserRequest(addingUserRequest);
         if (error != null) {
             LOGGER.log(Level.WARNING, "Registration validation failed: {0}", error);
-            request.setAttribute("error", error);
-            request.setAttribute("registerRequest", registerRequest);
-            request.getRequestDispatcher("/jsp/auth/register.jsp").forward(request, response);
+            request.getSession().setAttribute("error", error);
+            response.sendRedirect(request.getContextPath() + "/admin/list");
             return;
-        }
+        }     
         LOGGER.log(Level.INFO, "Validation passed successfully");
         
         
         // Create user
         User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setPassword(registerRequest.getPassword()); // TODO: Hash với BCrypt
-        user.setEmail(registerRequest.getEmail());
-        user.setFullName(registerRequest.getFullName());
-        user.setRole(registerRequest.getRole());
+        user.setUsername(addingUserRequest.getUsername());
+        user.setPassword(addingUserRequest.getPassword());
+        user.setEmail(addingUserRequest.getEmail());
+        user.setFullName(addingUserRequest.getFullName());
+        user.setRole(addingUserRequest.getRole());
         user.setIsActive(true);
         
         LOGGER.log(Level.INFO, "Creating user account: username={0}, roleId={1}", 
@@ -194,18 +196,18 @@ public class AdminController extends HttpServlet {
         
         if (!userDAO.createUser(user)) {
             LOGGER.log(Level.WARNING, "User creation failed: username or email already exists");
-            request.setAttribute("error", "Tên đăng nhập hoặc email đã tồn tại");
-            request.setAttribute("registerRequest", registerRequest);
-            request.getRequestDispatcher("/jsp/auth/register.jsp").forward(request, response);
+            request.getSession().setAttribute("error", "Tên đăng nhập hoặc email đã tồn tại");
+            
+            response.sendRedirect(request.getContextPath() + "/admin/list");
             return;
         }
         
         // Get created user to get ID
-        User createdUser = userDAO.getUserByUsername(registerRequest.getUsername());
+        User createdUser = userDAO.getUserByUsername(addingUserRequest.getUsername());
         if (createdUser == null) {
-            LOGGER.log(Level.SEVERE, "User created but could not retrieve: username={0}", registerRequest.getUsername());
+            LOGGER.log(Level.SEVERE, "User created but could not retrieve: username={0}", addingUserRequest.getUsername());
             request.setAttribute("error", "Có lỗi xảy ra khi tạo tài khoản");
-            request.getRequestDispatcher("/jsp/auth/register.jsp").forward(request, response);
+            request.getRequestDispatcher("/jsp/admin/user-list.jsp").forward(request, response);
             return;
         }
         
@@ -213,63 +215,63 @@ public class AdminController extends HttpServlet {
                 new Object[]{createdUser.getId(), createdUser.getUsername()});
         
         // Create student or lecturer based on role
-        if ("STUDENT".equals(registerRequest.getRole())) {
+        if ("STUDENT".equals(addingUserRequest.getRole())) {
             LOGGER.log(Level.INFO, "Creating student record for userId: {0}", createdUser.getId());
             LOGGER.log(Level.INFO, "Student data - MSSV: {0}, ClassName: {1}, Major: {2}", 
-                    new Object[]{registerRequest.getMssv(), registerRequest.getClassName(), registerRequest.getMajor()});
+                    new Object[]{addingUserRequest.getMssv(), addingUserRequest.getClassName(), addingUserRequest.getMajor()});
             
             Student student = new Student();
-            student.setMssv(registerRequest.getMssv());
+            student.setMssv(addingUserRequest.getMssv());
             student.setUserId(createdUser.getId());
-            student.setFullName(registerRequest.getFullName());
-            student.setClassName(registerRequest.getClassName());
-            student.setMajor(registerRequest.getMajor());
-            student.setEmail(registerRequest.getEmail());
+            student.setFullName(addingUserRequest.getFullName());
+            student.setClassName(addingUserRequest.getClassName());
+            student.setMajor(addingUserRequest.getMajor());
+            student.setEmail(addingUserRequest.getEmail());
             
             if (!studentDao.createStudent(student)) {
-                LOGGER.log(Level.WARNING, "Student creation failed: MSSV already exists: {0}", registerRequest.getMssv());
+                LOGGER.log(Level.WARNING, "Student creation failed: MSSV already exists: {0}", addingUserRequest.getMssv());
                 // Rollback: delete user
                 // userDAO.deleteUser(createdUser.getId());
-                request.setAttribute("error", "MSSV đã tồn tại");
-                request.setAttribute("registerRequest", registerRequest);
-                request.getRequestDispatcher("/jsp/auth/register.jsp").forward(request, response);
+                request.getSession().setAttribute("error", "MSSV đã tồn tại");
+                
+                request.getRequestDispatcher("/jsp/admin/user-list.jsp").forward(request, response);
                 return;
             }
             
-            LOGGER.log(Level.INFO, "Student record created successfully: mssv={0}", registerRequest.getMssv());
-        } else if ("LECTURER".equals(registerRequest.getRole())) {
+            LOGGER.log(Level.INFO, "Student record created successfully: mssv={0}", addingUserRequest.getMssv());
+        } else if ("LECTURER".equals(addingUserRequest.getRole())) {
             LOGGER.log(Level.INFO, "Creating lecturer record for userId: {0}", createdUser.getId());
             LOGGER.log(Level.INFO, "Lecturer data - MSCV: {0}, AcademicTitle: {1}, ResearchField: {2}", 
-                    new Object[]{registerRequest.getMscv(), registerRequest.getAcademicTitle(), registerRequest.getResearchField()});
+                    new Object[]{addingUserRequest.getMscv(), addingUserRequest.getAcademicTitle(), addingUserRequest.getResearchField()});
             
             Lecturer lecturer = new Lecturer();
-            lecturer.setMscv(registerRequest.getMscv());
+            lecturer.setMscv(addingUserRequest.getMscv());
             lecturer.setUserId(createdUser.getId());
-            lecturer.setFullName(registerRequest.getFullName());
-            lecturer.setAcademicTitle(registerRequest.getAcademicTitle());
-            lecturer.setResearchField(registerRequest.getResearchField());
-            lecturer.setEmail(registerRequest.getEmail());
+            lecturer.setFullName(addingUserRequest.getFullName());
+            lecturer.setAcademicTitle(addingUserRequest.getAcademicTitle());
+            lecturer.setResearchField(addingUserRequest.getResearchField());
+            lecturer.setEmail(addingUserRequest.getEmail());
             lecturer.setMaxStudents(5);
             
             if (!lecturerDao.createLecturer(lecturer)) {
-                LOGGER.log(Level.WARNING, "Lecturer creation failed: MSCV already exists: {0}", registerRequest.getMscv());
-                request.setAttribute("error", "MSCV đã tồn tại");
-                request.setAttribute("registerRequest", registerRequest);
-                request.getRequestDispatcher("/jsp/auth/register.jsp").forward(request, response);
+                LOGGER.log(Level.WARNING, "Lecturer creation failed: MSCV already exists: {0}", addingUserRequest.getMscv());
+                request.getSession().setAttribute("error", "MSCV đã tồn tại");
+                
+                request.getRequestDispatcher("/jsp/admin/user-list.jsp").forward(request, response);
                 return;
             }
             
-            LOGGER.log(Level.INFO, "Lecturer record created successfully: mscv={0}", registerRequest.getMscv());
+            LOGGER.log(Level.INFO, "Lecturer record created successfully: mscv={0}", addingUserRequest.getMscv());
         }
         
         // Send welcome email
-        LOGGER.log(Level.INFO, "Sending welcome email to: {0}", registerRequest.getEmail());
-        emailService.sendWelcomeEmailAsync(registerRequest.getEmail(), registerRequest.getUsername(), registerRequest.getFullName());
+        LOGGER.log(Level.INFO, "Sending welcome email to: {0}", addingUserRequest.getEmail());
+        emailService.sendWelcomeEmailAsync(addingUserRequest.getEmail(), addingUserRequest.getUsername(), addingUserRequest.getFullName());
         
         // Redirect to login with success message
-        LOGGER.log(Level.INFO, "Registration completed successfully for username: {0}", registerRequest.getUsername());
-        request.setAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
-        response.sendRedirect(request.getContextPath() + "/auth/login");
+        LOGGER.log(Level.INFO, "Add completed successfully for username: {0}", addingUserRequest.getUsername());
+        request.getSession().setAttribute("success", "Thêm thành công!");
+        response.sendRedirect(request.getContextPath() + "/admin/list");
     }    
     private void showAdminTopic(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String query = request.getParameter("query");
@@ -290,7 +292,7 @@ public class AdminController extends HttpServlet {
             throws ServletException, IOException {
       
         // Gọi DAO lấy danh sách (giả sử dùng các giá trị mặc định cho phân trang)
-        List<User> listUser = userDAO.getAllNewUsers();
+        List<AdminInformationRequest> listUser = userDAO.getAllInformation();
         request.setAttribute("listUser", listUser);
         request.getRequestDispatcher("/jsp/admin/user-list.jsp").forward(request, response);
     }
@@ -340,7 +342,7 @@ public class AdminController extends HttpServlet {
         }
         response.sendRedirect(request.getContextPath()+"/auth/login");
     }
-    private String validateRegisterRequest(RegisterRequest request) {
+    private String validateAddingUserRequest(AddingUserRequest request) {
         LOGGER.log(Level.INFO, "=== VALIDATION START ===");
         LOGGER.log(Level.INFO, "Validating username...");
         
@@ -363,10 +365,6 @@ public class AdminController extends HttpServlet {
         if (request.getPassword().length() < 6) {
             LOGGER.log(Level.WARNING, "Validation failed: Password too short: {0}", request.getPassword().length());
             return "Mật khẩu phải có ít nhất 6 ký tự";
-        }
-        if (!request.getPassword().equals(request.getConfirmPassword())) {
-            LOGGER.log(Level.WARNING, "Validation failed: Passwords do not match");
-            return "Mật khẩu xác nhận không khớp";
         }
         LOGGER.log(Level.FINE, "Password check passed");
         

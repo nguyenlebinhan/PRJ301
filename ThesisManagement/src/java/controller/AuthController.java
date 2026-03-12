@@ -61,10 +61,11 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String action = request.getPathInfo();
-        LOGGER.log(Level.INFO, "Action received in AuthController (POST): {0}", action);
         request.setCharacterEncoding("UTF-8"); // Đảm bảo nhận tiếng Việt
         response.setCharacterEncoding("UTF-8"); // Đảm bảo gửi tiếng Việt
+        response.setContentType("text/html; charset=UTF-8");
+        String action = request.getPathInfo();
+        LOGGER.log(Level.INFO, "Action received in AuthController (POST): {0}", action);        
 
         switch (action != null ? action : "") {
             case "/register":
@@ -318,6 +319,7 @@ public class AuthController extends HttpServlet {
             student.setClassName(registerRequest.getClassName());
             student.setMajor(registerRequest.getMajor());
             student.setEmail(registerRequest.getEmail());
+            student.setPhone(registerRequest.getPhone());
             
             if (!studentDAO.createStudent(student)) {
                 LOGGER.log(Level.WARNING, "Student creation failed: MSSV already exists: {0}", registerRequest.getMssv());
@@ -361,7 +363,7 @@ public class AuthController extends HttpServlet {
         
         // Redirect to login with success message
         LOGGER.log(Level.INFO, "Registration completed successfully for username: {0}", registerRequest.getUsername());
-        request.setAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
+        request.getSession().setAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
         response.sendRedirect(request.getContextPath() + "/auth/login");
     }
     
@@ -467,7 +469,7 @@ public class AuthController extends HttpServlet {
         
         if (username == null || password == null || username.isEmpty() || password.isEmpty()) {
             LOGGER.log(Level.WARNING, "Login failed: Missing username or password");
-            request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
+            request.getSession().setAttribute("error", "Vui lòng nhập đầy đủ thông tin");
             request.getRequestDispatcher("/jsp/auth/login.jsp").forward(request, response);
             return;
         }
@@ -492,7 +494,7 @@ public class AuthController extends HttpServlet {
             response.sendRedirect(redirectUrl);
         } else {
             LOGGER.log(Level.WARNING, "Login failed: Invalid credentials for username: {0}", username);
-            request.setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
+            request.getSession().setAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng");
             request.getRequestDispatcher("/jsp/auth/login.jsp").forward(request, response);
         }        
     }    

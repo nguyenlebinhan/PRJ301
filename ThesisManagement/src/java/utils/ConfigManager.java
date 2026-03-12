@@ -37,7 +37,7 @@ public class ConfigManager {
                 return;
             }
             
-            properties.load(input);
+            properties.load(new java.io.InputStreamReader(input, java.nio.charset.StandardCharsets.UTF_8));
             LOGGER.log(Level.INFO,"Successfully loade .env cofiguration file");
         }catch(IOException e){
             LOGGER.log(Level.SEVERE,"Error reading .env file", e);
@@ -64,7 +64,7 @@ public class ConfigManager {
     
     public String getProperty(String key, String defaultValue){
         String value = getProperty(key);
-        return (value != null)?key : defaultValue;
+        return (value != null)?value : defaultValue;
     }
     
     public int getIntProperty(String key, int defaultValue){

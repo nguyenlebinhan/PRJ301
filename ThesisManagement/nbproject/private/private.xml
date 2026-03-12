@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/dashboard.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/AppointmentDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Student.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AdminController.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/StudentDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/user-list.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Lecturer.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/TopicRegistrationDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/register.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AuthController.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/login.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AddingUserRequest.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/dashboard.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBInitializer.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/User.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/appointment.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/topic-manage.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/profile.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/UserDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/registration-list.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/RegisterRequest.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AdminInformationRequest.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/StudentController.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/filter/AuthFilter.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/LecturerController.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/LecturerDAO.java</file>
+        </group>
+    </open-files>
+</project-private>

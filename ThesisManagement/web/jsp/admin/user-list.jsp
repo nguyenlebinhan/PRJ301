@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>    
     
     <style>
         :root {
@@ -79,7 +81,7 @@
         }
     </style>
 </head>
-<body>
+<body>   
 
     <aside class="sidebar">
         <div class="sidebar-brand"><i class="bi bi-mortarboard-fill me-2 text-primary"></i> Thesis Management</div>
@@ -93,8 +95,27 @@
         </nav>
     </aside>
 
-    <main class="main-content">
-        <div class="d-flex justify-content-between align-items-end mb-4">
+    <main class="main-content">     
+        <c:if test="${not empty sessionScope.success}">
+            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+                <i class="fas fa-check-circle me-2"></i> ${sessionScope.success}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <c:remove var="success" scope="session" />
+        </c:if>
+        <c:if test="${not empty sessionScope.error}">
+            <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2 fs-4"></i>
+                    <div>
+                        <strong>Lỗi:</strong> ${sessionScope.error}
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <c:remove var="error" scope="session" />
+        </c:if>         
+        <div class="d-flex justify-content-between align-items-end mb-4">                
             <div>
                 <h3 class="fw-bold mb-1">Danh sách người dùng</h3>
                 <p class="text-muted mb-0">Quản lý tài khoản sinh viên, giảng viên và quản trị viên.</p>
@@ -125,7 +146,7 @@
                             <th>Thông tin người dùng</th>
                             <th>Vai trò</th>
                             <th>Trạng thái</th>
-                            <th class="text-end">Thao tác</th>
+                            <th>Thông tin chi tiết</th> <th class="text-end" style="padding-right: 20px;">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -156,10 +177,46 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td class="text-end">
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${u.role == 'STUDENT'}">
+                                            <div class="mb-1">
+                                                <span class="badge bg-info-subtle text-info" style="font-size: 0.7rem;">
+                                                    <i class="bi bi-card-list me-1"></i>${not empty u.mssv ? u.mssv : 'Chưa có'}
+                                                </span>
+                                                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">
+                                                    <i class="bi bi-door-open me-1"></i>${not empty u.className ? u.className : 'N/A'}
+                                                </span>
+                                            </div>
+                                            <div class="small text-muted">
+                                                <strong>Ngành:</strong> ${not empty u.major? u.major:'Chưa cập nhật'} <br>
+                                                <strong>GPA:</strong> <span class="text-primary fw-bold">${not empty u.gpa? u.gpa:'Chưa cập nhật'}</span> | 
+                                                <strong>SĐT:</strong> ${not empty u.phone? u.phone:'Chưa cập nhật'}
+                                            </div>
+                                            <div class="mt-1 small">
+                                                <i class="bi bi-tools me-1 text-muted"></i>
+                                                <span class="text-truncate d-inline-block" style="max-width: 150px;" title="${u.skills}">
+                                                    ${not empty u.skills ? u.skills : 'Chưa cập nhật'}
+                                                </span>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="small text-muted">
+                                                <c:if test="${u.role == 'LECTURER'}">
+                                                    <span class="badge bg-info-subtle text-info" style="font-size: 0.7rem;">
+                                                        <i class="bi bi-card-list me-1"></i>${not empty u.mscv ? u.mscv : 'Chưa có'}
+                                                    </span>
+                                                    <div class="fw-medium text-dark italic">Chức vị: ${not empty u.academicTitle? u.academicTitle:'N/A'}</div>
+                                                    <div class="text-truncate" style="max-width: 150px;">Lĩnh vực: ${not empty u.researchField? u.researchField:'N/A'}</div>
+                                                </c:if>
+                                            </div>
+                                        </c:otherwise>                                                                             
+                                    </c:choose>
+                                </td>                                
+                                <td class="text-end align-middle">
                                     <button type="button" 
                                             class="btn btn-action btn-light text-primary me-1" 
-                                            onclick="openEditModal('${u.id}', '${u.username}', '${u.fullName}', '${u.role}', '${u.mssv}', '${u.mscv}')"
+                                            onclick="openEditModal('${u.id}', '${u.username}', '${u.fullName}', '${u.role}','${u.mscv}','${u.academicTitle}','${u.researchField}','${u.mssv}','${u.className}','${u.major}','${u.gpa}','${u.skills}','${u.phone}')"
                                             title="Sửa thông tin">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>
@@ -192,57 +249,57 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Họ và tên</label>
-                                <input type="text" name="fullName" class="form-control bg-light border-0" placeholder="Nguyễn Văn A" required style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                <input type="text" name="fullName" class="form-control bg-light border-0" value="${addingUserRequest.fullName}" placeholder="Nguyễn Văn A" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Tên đăng nhập</label>
-                                <input type="text" name="username" class="form-control bg-light border-0" placeholder="username123" required style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                <input type="text" name="username" class="form-control bg-light border-0" value="${addingUserRequest.username}" placeholder="username123" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Email</label>
-                                <input type="email" name="email" class="form-control bg-light border-0" placeholder="example@gmail.com" required style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                <input type="email" name="email" class="form-control bg-light border-0" value="${addingUserRequest.email}" placeholder="example@gmail.com" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Mật khẩu</label>
-                                <input type="password" name="password" class="form-control bg-light border-0" placeholder="••••••••" required style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                <input type="password" name="password" class="form-control bg-light border-0" value="${addingUserRequest.password}" placeholder="••••••••" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
 
                             <div class="col-12">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Vai trò hệ thống</label>
                                 <select id="roleSelect" name="role" class="form-select bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
-                                    <option value="STUDENT" selected>Sinh viên</option>
-                                    <option value="TEACHER">Giảng viên</option>
-                                    <option value="ADMIN">Quản trị viên</option>
+                                    <option value="STUDENT" ${addingUserRequest.role == 'STUDENT' ? 'selected':''}>Sinh viên</option>
+                                    <option value="LECTURER" ${addingUserRequest.role == 'LECTURER' ? 'selected':''}>Giảng viên</option>
+                                    <option value="ADMIN" ${addingUserRequest.role == 'ADMIN' ? 'selected':''}>Quản trị viên</option>
                                 </select>
                             </div>
 
                             <div id="studentFields" class="row g-3 m-0 p-0">
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">MSSV</label>
-                                    <input type="text" name="mssv" class="form-control bg-light border-0" placeholder="20216001" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="mssv"  value="${addingUserRequest.mssv}" class="form-control bg-light border-0" placeholder="20216001" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Lớp</label>
-                                    <input type="text" name="class" class="form-control bg-light border-0" placeholder="KTPM01" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="className"  value="${addingUserRequest.className}" class="form-control bg-light border-0" placeholder="KTPM01" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Ngành</label>
-                                    <input type="text" name="major" class="form-control bg-light border-0" placeholder="Công nghệ phần mềm" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="major"  value="${addingUserRequest.major}" class="form-control bg-light border-0" placeholder="Công nghệ phần mềm" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                             </div>
 
-                            <div id="teacherFields" class="row g-3 m-0 p-0" style="display: none;">
+                            <div id="lecturerFields" class="row g-3 m-0 p-0" style="display: none;">
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">MSCV</label>
-                                    <input type="text" name="mscb" class="form-control bg-light border-0" placeholder="GV123" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="mscv"  value="${addingUserRequest.mscv}" class="form-control bg-light border-0" placeholder="GV123" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Học hàm/Học vị</label>
-                                    <input type="text" name="mscb" class="form-control bg-light border-0" placeholder="Giáo sư ..." style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="academicTitle"   value="${addingUserRequest.academicTitle}"class="form-control bg-light border-0" placeholder="Giáo sư ..." style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                                 <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">Lĩnh vực nghiên cứu</label>
-                                    <input type="text" name="mscb" class="form-control bg-light border-0" placeholder="Trí tuệ nhân tạo ..." style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="researchField" value="${addingUserRequest.researchField}" class="form-control bg-light border-0" placeholder="Trí tuệ nhân tạo ..." style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                             </div>
                         </div>
@@ -268,7 +325,6 @@
 
                 <form action="${pageContext.request.contextPath}/admin/update" method="POST">
                     <input type="hidden" name="id" id="edit_id">
-
                     <div class="modal-body p-4">
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -279,30 +335,54 @@
                                 <label class="form-label small fw-bold text-muted text-uppercase">Họ và tên</label>
                                 <input type="text" name="fullName" id="edit_fullName" class="form-control bg-light border-0" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Vai trò hệ thống</label>
                                 <select id="edit_roleSelect" name="role" class="form-select bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                     <option value="STUDENT">Sinh viên</option>
-                                    <option value="TEACHER">Giảng viên</option>
+                                    <option value="LECTURER">Giảng viên</option>
                                     <option value="ADMIN">Quản trị viên</option>
                                 </select>
                             </div>
 
                             <div id="edit_studentFields" class="row g-3 m-0 p-0">
-                                <div class="col-md-6 mt-3">
+                                <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">MSSV</label>
                                     <input type="text" name="mssv" id="edit_mssv" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Lớp</label>
+                                    <input type="text" name="className" id="edit_className" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Ngành</label>
+                                    <input type="text" name="major" id="edit_major" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>                                
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">GPA</label>
+                                    <input type="text" name="gpa" id="edit_gpa" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Kĩ Năng</label>
+                                    <input type="text" name="skills" id="edit_skills" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>  
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Số điện thoại</label>
+                                    <input type="text" name="phone" id="edit_phone" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>                                   
                             </div>
 
-                            <div id="edit_teacherFields" class="row g-3 m-0 p-0" style="display: none;">
-                                <div class="col-md-6 mt-3">
+                            <div id="edit_lecturerFields" class="row g-3 m-0 p-0" style="display: none;">
+                                <div class="col-md-4 mt-3">
                                     <label class="form-label small fw-bold text-muted text-uppercase">MSCV</label>
-                                    <input type="text" name="mscb" id="edit_mscb" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <input type="text" name="mscv" id="edit_mscv" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
-                                <div class="col-md-6 mt-3">
-                                    <label class="form-label small fw-bold text-muted text-uppercase">Học vị</label>
-                                    <input type="text" name="degree" id="edit_degree" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Học hàm/Học vị</label>
+                                    <input type="text" name="academicTitle" id="edit_academicTitle" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                </div>
+                                <div class="col-md-4 mt-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">Lĩnh vực</label>
+                                    <input type="text" name="researchField" id="edit_researchField" class="form-control bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
                                 </div>
                             </div>
                         </div>
@@ -315,73 +395,81 @@
                 </form>
             </div>
         </div>
-    </div>                    
+    </div>                   
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const roleSelect = document.getElementById('roleSelect');
             const studentFields = document.getElementById('studentFields');
-            const teacherFields = document.getElementById('teacherFields');
+            const lecturerFields = document.getElementById('lecturerFields');
 
             roleSelect.addEventListener('change', function() {
                 const role = this.value;
 
                 if (role === 'STUDENT') {
                     studentFields.style.display = 'flex';
-                    teacherFields.style.display = 'none';
+                    lecturerFields.style.display = 'none';
                     // Toggle thuộc tính required nếu cần
-                } else if (role === 'TEACHER') {
+                } else if (role === 'LECTURER') {
                     studentFields.style.display = 'none';
-                    teacherFields.style.display = 'flex';
+                    lecturerFields.style.display = 'flex';
                 } else {
                     // Nếu là ADMIN thì ẩn cả hai
                     studentFields.style.display = 'none';
-                    teacherFields.style.display = 'none';
+                    lecturerFields.style.display = 'none';
                 }
             });
         });
     </script>  
     <script>
-        // Hàm mở modal và đổ dữ liệu
-        function openEditModal(id, username, fullName, role, mssv,, mscb) {
-            // 1. Gán giá trị vào các ô input
-            document.getElementById('edit_id').value = id;
-            document.getElementById('edit_username').value = username;
-            document.getElementById('edit_fullName').value = fullName;
-            document.getElementById('edit_roleSelect').value = role;
+    function openEditModal(id, username, fullName, role, mscv, academicTitle, researchField, mssv, className, major, gpa, skills, phone) {
+        // 1. Gán giá trị cơ bản
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_username').value = username;
+        document.getElementById('edit_fullName').value = fullName;
+        document.getElementById('edit_roleSelect').value = role;
+        document.getElementById('edit_phone').value = phone || '';
 
-            // Gán dữ liệu riêng (nếu có)
-            if(document.getElementById('edit_mssv')) document.getElementById('edit_mssv').value = mssv || '';
-            if(document.getElementById('edit_mscb')) document.getElementById('edit_mscb').value = mscb || '';
+        // 2. Gán giá trị Sinh viên
+        if(document.getElementById('edit_mssv')) document.getElementById('edit_mssv').value = mssv || '';
+        if(document.getElementById('edit_className')) document.getElementById('edit_className').value = className || '';
+        if(document.getElementById('edit_major')) document.getElementById('edit_major').value = major || '';
+        if(document.getElementById('edit_gpa')) document.getElementById('edit_gpa').value = gpa || '';
+        if(document.getElementById('edit_skills')) document.getElementById('edit_skills').value = skills || '';
+        if(document.getElementById('edit_phone')) document.getElementById('edit_phone').value = phone || '';
 
-            // 2. Chạy logic ẩn hiện dựa trên role của user được sửa
-            toggleEditFields(role);
+        // 3. Gán giá trị Giảng viên
+        if(document.getElementById('edit_mscv')) document.getElementById('edit_mscv').value = mscv || '';
+        if(document.getElementById('edit_academicTitle')) document.getElementById('edit_academicTitle').value = academicTitle || '';
+        if(document.getElementById('edit_researchField')) document.getElementById('edit_researchField').value = researchField || '';
 
-            // 3. Hiển thị modal
-            var myModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-            myModal.show();
+        // 4. Hiển thị các trường tương ứng với Role
+        toggleEditFields(role);
+
+        // 5. Mở Modal
+        var myModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+        myModal.show();
+    }
+
+    // Lắng nghe sự thay đổi role ngay trong Modal Edit
+    document.getElementById('edit_roleSelect').addEventListener('change', function() {
+        toggleEditFields(this.value);
+    });
+
+    function toggleEditFields(role) {
+        const studentFields = document.getElementById('edit_studentFields');
+        const lecturerFields = document.getElementById('edit_lecturerFields');
+
+        if (role === 'STUDENT') {
+            studentFields.style.display = 'flex';
+            lecturerFields.style.display = 'none';
+        } else if (role === 'LECTURER') {
+            studentFields.style.display = 'none';
+            lecturerFields.style.display = 'flex';
+        } else {
+            studentFields.style.display = 'none';
+            lecturerFields.style.display = 'none';
         }
-
-        // Hàm xử lý ẩn hiện cho Modal Sửa
-        function toggleEditFields(role) {
-            const studentFields = document.getElementById('edit_studentFields');
-            const teacherFields = document.getElementById('edit_teacherFields');
-
-            if (role === 'STUDENT') {
-                studentFields.style.display = 'flex';
-                teacherFields.style.display = 'none';
-            } else if (role === 'TEACHER') {
-                studentFields.style.display = 'none';
-                teacherFields.style.display = 'flex';
-            } else {
-                studentFields.style.display = 'none';
-                teacherFields.style.display = 'none';
-            }
-        }
-
-        // Lắng nghe sự kiện thay đổi role ngay trong Modal Sửa
-        document.getElementById('edit_roleSelect').addEventListener('change', function() {
-            toggleEditFields(this.value);
-        });
+    }
     </script>    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

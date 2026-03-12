@@ -8,12 +8,12 @@ import service.AIService;
 import com.google.gson.JsonObject;
 import dao.AppointmentDAO;
 import dao.LecturerDAO;
-import dao.ProgressDAO;
 import dao.StudentDAO;
 import dao.ThesisDAO;
 import dao.ThesisHistoryDAO;
 import dao.TopicDAO;
 import dao.TopicRegistrationDAO;
+import dao.UserDAO;
 import dto.StudentProfileRequestDTO;
 import dto.ThesisHistoryResponse;
 import dto.ThesisUpdateRequest;
@@ -27,7 +27,6 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import model.Lecturer;
@@ -51,10 +50,10 @@ import model.Appointment;
 
 public class StudentController extends HttpServlet {
     private final Logger LOGGER =Logger.getLogger(StudentController.class.getName());
+    private final UserDAO userDAO = new UserDAO();
     private final StudentDAO studentDAO = new StudentDAO();
     private final LecturerDAO lecturerDao = new LecturerDAO();
     private final ThesisDAO thesisDAO = new ThesisDAO();
-    private final ProgressDAO progressDAO = new ProgressDAO();
     private final TopicDAO topicDao = new TopicDAO();
     private final TopicRegistrationDAO topicRegistrationDao = new TopicRegistrationDAO();
     private final ThesisHistoryDAO thesisHistoryDAO = new ThesisHistoryDAO();
@@ -133,6 +132,9 @@ public class StudentController extends HttpServlet {
                 break;
             case "/thesis/update":
                 handleThesisUpdate(request,response,user);
+                break;
+            case "/profile/deactivate":
+                handleDeactiveUser(request,response,user);
                 break;
             case "/appointment/create":
                 createAppointment(request,response,user);
@@ -260,56 +262,74 @@ public class StudentController extends HttpServlet {
             }
         }
     }    
-    private void handleThesisUpdate(HttpServletRequest request, HttpServletResponse response,User user) throws IOException {
-           
-            try {
-                Student student = studentDAO.getStudentByUserId(user.getId());
-                Lecturer supervisor = topicRegistrationDao.getLecturerByMssv(student.getMssv());
-                String topicName = topicDao.getTopicNameById(Integer.parseInt(request.getParameter("topicId")));
-                // 1. Xử lý Upload File
-                int thesisId = Integer.parseInt(request.getParameter("thesisId"));
-                Part filePart = request.getPart("reportFile");
-                String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+    private void handleThesisUpdate(HttpServletRequest request, HttpServletResponse response,User user) throws IOException {          
+        try {
+            Student student = studentDAO.getStudentByUserId(user.getId());
+            Lecturer supervisor = topicRegistrationDao.getLecturerByMssv(student.getMssv());
+            String topicName = topicDao.getTopicNameById(Integer.parseInt(request.getParameter("topicId")));
+            // 1. Xử lý Upload File
+            int thesisId = Integer.parseInt(request.getParameter("thesisId"));
+            Part filePart = request.getPart("reportFile");
+            String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
 
-                // Đường dẫn lưu file trong thư mục 'uploads' của project
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdir();
+            // Đường dẫn lưu file trong thư mục 'uploads' của project
+            String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) uploadDir.mkdir();
 
-                filePart.write(uploadPath + File.separator + fileName);
+            filePart.write(uploadPath + File.separator + fileName);
 
-                // 2. Tạo URL nội bộ để Python có thể truy cập vào file vừa upload
-                String fileUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
-                                 + request.getContextPath() + "/uploads/" + fileName;
+            // 2. Tạo URL nội bộ để Python có thể truy cập vào file vừa upload
+            String fileUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
+                             + request.getContextPath() + "/uploads/" + fileName;
 
-                // 3. Gọi AI bằng URL của file vừa nộp
-                AIService aiService = new AIService();
-                JsonObject plagiarismResult = aiService.checkPlagiarismAuto(fileUrl);
-                JsonObject relevanceResult = aiService.checkTopicRelevant(fileUrl,topicName );
-                double similarityScore = plagiarismResult.get("similarity_score").getAsDouble();
-                String plagiarismStatus = plagiarismResult.get("plagiarism_status").getAsString();
-                String bestSource = plagiarismResult.get("best_source").getAsString();
-                String plagiarismAnalysis = plagiarismResult.get("plagiarism_analysis").getAsString();
-                double relevantTopicScore = relevanceResult.get("relevance_score").getAsDouble();
-                String relevanceStatus = relevanceResult.get("relevance_status").getAsString();
-                String relevanceAnalysis = relevanceResult.get("relevance_analysis").getAsString();
-                // 4. Lưu vào Database (Lưu fileUrl vào cột reportFile)
-                ThesisUpdateRequest newThesis = new ThesisUpdateRequest(
-                    thesisId,fileUrl, request.getParameter("sourceCodeLink"),similarityScore,plagiarismStatus,bestSource,plagiarismAnalysis,relevantTopicScore,relevanceStatus,relevanceAnalysis
-                );
+            // 3. Gọi AI bằng URL của file vừa nộp
+            AIService aiService = new AIService();
+            JsonObject plagiarismResult = aiService.checkPlagiarismAuto(fileUrl);
+            JsonObject relevanceResult = aiService.checkTopicRelevant(fileUrl,topicName );
+            double similarityScore = plagiarismResult.get("similarity_score").getAsDouble();
+            String plagiarismStatus = plagiarismResult.get("plagiarism_status").getAsString();
+            String bestSource = plagiarismResult.get("best_source").getAsString();
+            String plagiarismAnalysis = plagiarismResult.get("plagiarism_analysis").getAsString();
+            double relevantTopicScore = relevanceResult.get("relevance_score").getAsDouble();
+            String relevanceStatus = relevanceResult.get("relevance_status").getAsString();
+            String relevanceAnalysis = relevanceResult.get("relevance_analysis").getAsString();
+            // 4. Lưu vào Database (Lưu fileUrl vào cột reportFile)
+            ThesisUpdateRequest newThesis = new ThesisUpdateRequest(
+                thesisId,fileUrl, request.getParameter("sourceCodeLink"),similarityScore,plagiarismStatus,bestSource,plagiarismAnalysis,relevantTopicScore,relevanceStatus,relevanceAnalysis
+            );
 
-                thesisDAO.updateThesis(newThesis);
+            thesisDAO.updateThesis(newThesis);
 
-                request.getSession().setAttribute("success", "Upload và kiểm tra AI thành công!");
-                response.sendRedirect(request.getContextPath() + "/student/dashboard");
+            request.getSession().setAttribute("success", "Upload và kiểm tra AI thành công!");
+            response.sendRedirect(request.getContextPath() + "/student/dashboard");
 
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Lỗi upload file", e);
-                response.sendRedirect(request.getContextPath() + "/student/dashboard?error=upload");
-            }     
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi upload file", e);
+            response.sendRedirect(request.getContextPath() + "/student/dashboard?error=upload");
+        }     
     }
-   
+    private void handleDeactiveUser(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+        try {
+            boolean isDeactivated = userDAO.deactivateUser(user.getId());
+            if(isDeactivated){
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.invalidate(); 
+                }
+                request.getSession(true).setAttribute("success", "Tài khoản của bạn đã được vô hiệu hóa thành công.");
 
+                response.sendRedirect(request.getContextPath() + "/auth/login");                
+            } else {
+                request.getSession().setAttribute("error", "Không thể vô hiệu hóa tài khoản lúc này.");
+                response.sendRedirect(request.getHeader("Referer"));
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi vô hiệu hóa user id: " + user.getId(), e);
+            response.sendRedirect(request.getContextPath() + "/auth/login?error=system_error");
+        }          
+    }
     private void handleAddThesis(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             Student student = studentDAO.getStudentByUserId(user.getId());
@@ -523,4 +543,5 @@ public class StudentController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/student/topics?error=invalid_id");
         }
     }
+
 }

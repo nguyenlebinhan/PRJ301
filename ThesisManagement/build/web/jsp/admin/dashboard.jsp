@@ -144,7 +144,25 @@
     </style>
 </head>
 <body>
-
+    <c:if test="${not empty sessionScope.success}">
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <i class="fas fa-check-circle me-2"></i> ${sessionScope.success}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <c:remove var="success" scope="session" />
+    </c:if>
+    <c:if test="${not empty sessionScope.error}">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle me-2 fs-4"></i>
+                <div>
+                    <strong>Lỗi:</strong> ${sessionScope.error}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <c:remove var="error" scope="session" />
+    </c:if>     
     <aside class="sidebar">
         <div class="sidebar-brand">
             <i class="bi bi-mortarboard-fill me-2 text-primary"></i> Thesis Management
