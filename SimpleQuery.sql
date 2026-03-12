@@ -2,6 +2,7 @@
 select * from TopicRegistrations where status = 'ACCEPTED' AND mssv='SV001';
 select* from Topics;
 select * from Students;
+Select * from Users;
 select * from Lecturers;
 SELECT DISTINCT tr.mssv, s.fullName, s.gpa, s.major, s.className,s.email FROM TopicRegistrations tr INNER JOIN Students s ON s.mssv = tr.mssv WHERE tr.mscvHD = 'GV001' AND tr.status = 'ACCEPTED';
 Select l.fullName from TopicRegistrations tr inner join Lecturers l on l.mscv=tr.mscvHD where tr.mssv = 'SV001' and tr.status='ACCEPTED';
@@ -78,3 +79,4 @@ select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiari
 select * from ResetTokens;
 
 select a.appointmentId,a.mssv,a.mscv,tp.title,a.purpose,a.meetingDate,a.location,a.createdAt from Appointment a inner join Theses t on t.thesisId = a.thesisId inner join Topics tp on tp.topicId = t.topicId where mscv = 'GV001' and a.status ='PENDING'
+select u.*,l.mscv,l.academicTitle,l.researchField,s.mssv,s.className,s.major,s.gpa,s.skills,s.phone from Users u left join Students s on u.id=s.userId left join Lecturers l on l.userId=u.id 
