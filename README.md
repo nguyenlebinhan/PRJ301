@@ -257,7 +257,7 @@ The main controllers are under `src/java/controller`, data access (DAO) classes 
 
 **English**
 
-- **Author**: Update this section with your name/team/supervisor information as needed.
+- **Author**:  Nguyễn Lê Binh An - Quach Hoàng Hải - Nguyễn Hữu Thành Vinh.
 - **License**: Currently intended for learning/academic purposes. For public release, add a `LICENSE` file (e.g., MIT, Apache 2.0) 
 ---
 

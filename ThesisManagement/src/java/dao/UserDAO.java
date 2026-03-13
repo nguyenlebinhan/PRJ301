@@ -251,16 +251,17 @@ public class UserDAO {
         LOGGER.log(Level.INFO, "Updating user: id={0}, username={1}", 
                 new Object[]{user.getId(), user.getUsername()});
         
-        String sql = "UPDATE Users SET email = ?, fullName = ?, role = ?, isActive = ? WHERE id = ?";
+        String sql = "UPDATE Users SET username = ? ,email = ?, fullName = ?, role = ?, isActive = ? WHERE id = ?";
         
         try (Connection conn = dbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
-            ps.setString(1, user.getEmail());
-            ps.setNString(2, user.getFullName());
-            ps.setString(3, user.getRole());
-            ps.setBoolean(4, user.getIsActive());
-            ps.setInt(5, user.getId());
+            ps.setString(1,user.getUsername());
+            ps.setString(2, user.getEmail());
+            ps.setNString(3, user.getFullName());
+            ps.setString(4, user.getRole());
+            ps.setBoolean(5, user.getIsActive());
+            ps.setInt(6, user.getId());
             
             int rowsAffected = ps.executeUpdate();
             if (rowsAffected > 0) {

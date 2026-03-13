@@ -141,10 +141,6 @@
             <form action="update-profile" method="POST">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Số điện thoại</label>
-                        <input type="text" name="phone" class="form-control" value="${lecturer.phone}">
-                    </div>
-                    <div class="mb-3">
                         <label class="form-label">Lĩnh vực nghiên cứu</label>
                         <textarea name="research" class="form-control" rows="3">${lecturer.researchArea}</textarea>
                     </div>

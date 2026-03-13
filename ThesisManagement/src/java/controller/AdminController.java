@@ -9,17 +9,14 @@ import dao.TopicRegistrationDAO;
 import dao.UserDAO;
 import dto.AddingUserRequest;
 import dto.AdminInformationRequest;
-import dto.RegisterRequest;
-
 import model.User;
-//import model.Role;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -93,9 +90,9 @@ public class AdminController extends HttpServlet {
 
         try {
             switch (action != null ? action : "") {
-                case "/update":
+                case "/updateUser":
                     updateUser(request, response);
-                    break;
+                    break;                  
                 case "/logout":
                     logoutUser(request,response);
                     break;
@@ -182,7 +179,6 @@ public class AdminController extends HttpServlet {
         LOGGER.log(Level.INFO, "Validation passed successfully");
         
         
-        // Create user
         User user = new User();
         user.setUsername(addingUserRequest.getUsername());
         user.setPassword(addingUserRequest.getPassword());
@@ -202,7 +198,6 @@ public class AdminController extends HttpServlet {
             return;
         }
         
-        // Get created user to get ID
         User createdUser = userDAO.getUserByUsername(addingUserRequest.getUsername());
         if (createdUser == null) {
             LOGGER.log(Level.SEVERE, "User created but could not retrieve: username={0}", addingUserRequest.getUsername());
@@ -214,7 +209,6 @@ public class AdminController extends HttpServlet {
         LOGGER.log(Level.INFO, "User created successfully: id={0}, username={1}", 
                 new Object[]{createdUser.getId(), createdUser.getUsername()});
         
-        // Create student or lecturer based on role
         if ("STUDENT".equals(addingUserRequest.getRole())) {
             LOGGER.log(Level.INFO, "Creating student record for userId: {0}", createdUser.getId());
             LOGGER.log(Level.INFO, "Student data - MSSV: {0}, ClassName: {1}, Major: {2}", 
@@ -310,15 +304,53 @@ public class AdminController extends HttpServlet {
     private void updateUser(HttpServletRequest request, HttpServletResponse response) 
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
+        String username = request.getParameter("username");
         String fullName = request.getParameter("fullName");
         String role = request.getParameter("role");
+        String mssv = request.getParameter("mssv");
+        String className = request.getParameter("className");
+        String major = request.getParameter("major");
+        String email = request.getParameter("email");
+        int isActive = Integer.parseInt(request.getParameter("isActive"));
+        BigDecimal gpa = new BigDecimal(request.getParameter("gpa"));
+        String skills = request.getParameter("skills");
+        String phone = request.getParameter("phone");
+        String mscv = request.getParameter("mscv");
+        String academicTitle = request.getParameter("academicTitle");
+        String researchField = request.getParameter("researchField");
 
         User user = new User();
+        user.setUsername(username);
+        user.setEmail(email);
         user.setId(id);
         user.setFullName(fullName);
         user.setRole(role);
+        if(isActive == 1){
+            user.setIsActive(true);
+        }else{
+            user.setIsActive(false);
+        }
         
         if (userDAO.updateUser(user)) {
+            User updatedUser = userDAO.getUserByUsername(username);
+            if(updatedUser.getRole().equals("STUDENT")){
+                Student student = new Student();
+                student.setMssv(mssv);
+                student.setUserId(id);
+                student.setFullName(fullName);
+                student.setClassName(className);
+                student.setMajor(major);
+                student.setGpa(gpa);
+                student.setSkills(skills);
+                student.setEmail(email);
+                student.setPhone(phone);
+                boolean isUpdated = studentDao.updateStudentByUserId(student);
+                if(isUpdated){
+                    request.getSession().setAttribute("success", "Update thành công");
+                    response.sendRedirect("");
+                }
+                                
+            }
             response.sendRedirect("list?msg=update_success");
         } else {
             response.sendRedirect("edit?id=" + id + "&error=1");

@@ -216,7 +216,7 @@
                                 <td class="text-end align-middle">
                                     <button type="button" 
                                             class="btn btn-action btn-light text-primary me-1" 
-                                            onclick="openEditModal('${u.id}', '${u.username}', '${u.fullName}', '${u.role}','${u.mscv}','${u.academicTitle}','${u.researchField}','${u.mssv}','${u.className}','${u.major}','${u.gpa}','${u.skills}','${u.phone}')"
+                                            onclick="openEditModal('${u.id}', '${u.username}', '${u.fullName}','${u.email}','${isActive}', '${u.role}','${u.mscv}','${u.academicTitle}','${u.researchField}','${u.mssv}','${u.className}','${u.major}','${u.gpa}','${u.skills}','${u.phone}')"
                                             title="Sửa thông tin">
                                         <i class="bi bi-pencil-fill"></i>
                                     </button>
@@ -323,18 +323,29 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                <form action="${pageContext.request.contextPath}/admin/update" method="POST">
+                <form action="${pageContext.request.contextPath}/admin/updateUser" method="POST">
                     <input type="hidden" name="id" id="edit_id">
                     <div class="modal-body p-4">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Tên đăng nhập</label>
-                                <input type="text" id="edit_username" class="form-control bg-light border-0" disabled style="border-radius: 10px;">
+                                <input type="text" name="username" id="edit_username" class="form-control bg-light border-0" required style="border-radius: 10px;">
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Họ và tên</label>
                                 <input type="text" name="fullName" id="edit_fullName" class="form-control bg-light border-0" required style="padding: 0.7rem 1rem; border-radius: 10px;">
                             </div>
+                             <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Email</label>
+                                <input type="text" name="email" id="edit_email" class="form-control bg-light border-0" required style="padding: 0.7rem 1rem; border-radius: 10px;">
+                            </div> 
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted text-uppercase">Trạng thái hoạt động</label>
+                                <select id="edit_activeSelect" name="active" class="form-select bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
+                                    <option value="1">Hoạt động</option>
+                                    <option value="0">Không hoạt động</option>
+                                </select>
+                            </div>                           
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-muted text-uppercase">Vai trò hệ thống</label>
                                 <select id="edit_roleSelect" name="role" class="form-select bg-light border-0" style="padding: 0.7rem 1rem; border-radius: 10px;">
@@ -421,13 +432,20 @@
         });
     </script>  
     <script>
-    function openEditModal(id, username, fullName, role, mscv, academicTitle, researchField, mssv, className, major, gpa, skills, phone) {
-        // 1. Gán giá trị cơ bản
+    function openEditModal(id, username, fullName,email,isActive, role, mscv, academicTitle, researchField, mssv, className, major, gpa, skills, phone) {
         document.getElementById('edit_id').value = id;
         document.getElementById('edit_username').value = username;
         document.getElementById('edit_fullName').value = fullName;
+        document.getElementById('edit_email').value = email;
+        if(isActive === true){
+            document.getElementById('edit_activeSelect').value = 1;
+        }else if(isActive === false){
+            document.getElementById('edit_activeSelect').value = 0;
+        }
+        
         document.getElementById('edit_roleSelect').value = role;
         document.getElementById('edit_phone').value = phone || '';
+        
 
         // 2. Gán giá trị Sinh viên
         if(document.getElementById('edit_mssv')) document.getElementById('edit_mssv').value = mssv || '';

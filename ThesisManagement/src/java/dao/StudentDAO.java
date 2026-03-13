@@ -190,6 +190,29 @@ public class StudentDAO {
         }
     }
     
+    public boolean updateStudentByUserId(Student student) {
+        String sql = "UPDATE Students SET mssv = ? ,fullName = ?, className = ?, major = ?, gpa = ?, "
+                + "skills = ?, email = ?, phone = ? WHERE userId = ?";
+        
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, student.getMssv());
+            ps.setNString(2, student.getFullName());
+            ps.setNString(3, student.getClassName());
+            ps.setNString(4, student.getMajor());
+            ps.setBigDecimal(5, student.getGpa());
+            ps.setNString(6, student.getSkills());
+            ps.setString(7, student.getEmail());
+            ps.setString(8, student.getPhone());
+            ps.setInt(9, student.getUserId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating student", e);
+            return false;
+        }
+    }    
+    
     public boolean updateProfileUser(Student student) {
         String sql = "UPDATE Students SET fullName = ?,className = ?,major = ?,"
                 + "email = ?, phone = ? WHERE mssv = ?";

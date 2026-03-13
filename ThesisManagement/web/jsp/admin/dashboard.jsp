@@ -250,10 +250,6 @@
 
 
         <div class="card-custom overflow-hidden">
-            <div class="p-4 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0">Người dùng mới đăng ký</h6>
-                <button class="btn btn-sm btn-light fw-medium">Xem tất cả</button>
-            </div>
             <div class="table-responsive">
                 <table class="table align-middle mb-0">
                     <thead>
@@ -292,7 +288,7 @@
             </div>
         </div>
     </main>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
