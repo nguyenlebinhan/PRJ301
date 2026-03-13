@@ -17,6 +17,7 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/login.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AddingUserRequest.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/dashboard.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/.gitignore</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBInitializer.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/User.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/appointment.jsp</file>
@@ -31,6 +32,7 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/filter/AuthFilter.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/LecturerController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/LecturerDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/.env</file>
         </group>
     </open-files>
 </project-private>

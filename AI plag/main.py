@@ -47,7 +47,6 @@ class TopicRelevanceRequest(BaseModel):
     
 print("--- Hệ thống Plagiarism Hybrid PRO  - FPT University Edition ---")
 
-
 def get_content_from_url(url: str, timeout=7):
     """Cào dữ liệu với timeout ngắn để tránh treo hệ thống"""
     try:
