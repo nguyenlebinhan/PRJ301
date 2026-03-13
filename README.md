@@ -252,18 +252,17 @@ The main controllers are under `src/java/controller`, data access (DAO) classes 
 
 **Tiếng Việt**
 
-- **Tác giả**: Bạn có thể cập nhật thông tin nhóm/giảng viên/sinh viên tại đây.
-- **Giấy phép (License)**: Dự án dùng cho học tập/thực hành. Nếu cần phát hành công khai, hãy thêm file `LICENSE` (ví dụ: MIT, Apache 2.0) và cập nhật mô tả tại đây.
+- **Tác giả**: Nguyễn Lê Binh An - Quach Hoàng Hải - Nguyễn Hữu Thành Vinh.
+- **Giấy phép (License)**: Dự án dùng cho học tập/thực hành. Nếu cần phát hành công khai, hãy thêm file `LICENSE` (ví dụ: MIT, Apache 2.0) 
 
 **English**
 
 - **Author**: Update this section with your name/team/supervisor information as needed.
-- **License**: Currently intended for learning/academic purposes. For public release, add a `LICENSE` file (e.g., MIT, Apache 2.0) and describe it here.
-
+- **License**: Currently intended for learning/academic purposes. For public release, add a `LICENSE` file (e.g., MIT, Apache 2.0) 
 ---
 
 ## 📩 Liên hệ / Contact
 
-Nếu bạn cần hỗ trợ cấu hình hoặc chạy dự án, hãy liên hệ trực tiếp với nhóm phát triển hoặc giảng viên hướng dẫn của đồ án.
+Nếu bạn cần hỗ trợ cấu hình hoặc chạy dự án, hãy liên hệ trực tiếp với nhóm phát triển.
 
-For support or questions about configuration and running the project, please contact the project team or your course instructor.
+For support or questions about configuration and running the project, please contact the project team.
