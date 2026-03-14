@@ -31,24 +31,7 @@ public class DBInitializer {
                 + "isActive BIT DEFAULT 1) ";
         execute(conn, sql, "Users");
     }
-    
-    private void createAppointmentTable(Connection conn) throws SQLException {
-        String sql = "CREATE TABLE Appointment ("
-                + "appointmentId INT PRIMARY KEY IDENTITY(1,1), "
-                + "mssv VARCHAR(20) NOT NULL, "
-                + "mscv VARCHAR(20) NOT NULL, "
-                + "thesisId INT, "
-                + "purpose NVARCHAR(500),"
-                + "meetingDate DATETIME NOT NULL, "
-                + "location NVARCHAR(500), "
-                + "status VARCHAR(50) DEFAULT 'Pending', "
-                + "createdAt DATETIME DEFAULT GETDATE(), "
-                + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE CASCADE,"
-                + "FOREIGN KEY (mscv) REFERENCES Lecturers(mscv) ON DELETE NO ACTION,"
-                + "FOREIGN KEY (thesisId) REFERENCES THESES(thesisId) ON DELETE NO ACTION "
-                + ")";
-        execute(conn, sql, "Appointment");
-    }
+   
     
     private void createStudentsTable(Connection conn) throws SQLException {
         String sql = "CREATE TABLE Students ("
@@ -183,7 +166,6 @@ public class DBInitializer {
             }
 
             String[] dropOrder = {
-                "Appointment",
                 "ThesisHistory",     // Tham chiếu Theses                
                 "TopicRegistrations",// Tham chiếu Topics, Students, Lecturers
                 "ResetTokens",       // Tham chiếu Users
@@ -198,7 +180,7 @@ public class DBInitializer {
             String[] createOrder = {
                  "Users", "Students", "Lecturers", "Topics", 
                 "Theses","ThesisHistory", 
-                "Appointment", "TopicRegistrations", "ResetTokens"
+                "TopicRegistrations", "ResetTokens"
             };
 
             if (enforceReset) {
@@ -217,7 +199,6 @@ public class DBInitializer {
                         case "Topics": createTopicsTable(conn); break;
                         case "Theses": createThesesTable(conn); break;
                         case "ThesisHistory": createThesisHistory(conn);break;
-                        case "Appointment" : createAppointmentTable(conn);break;
                         case "TopicRegistrations": createTopicRegistrationsTable(conn); break;
                         case "ResetTokens": createResetTokensTable(conn); break;
                     }
