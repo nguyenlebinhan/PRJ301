@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Topic;
 
 /**
  * Data Access Object cho User
@@ -216,7 +217,75 @@ public class UserDAO {
         return infos;
     }    
     
-    
+    public List<AdminInformationRequest> searchUser(String name) {
+        LOGGER.log(Level.INFO, "Search users");
+        
+        List<AdminInformationRequest> infos = new ArrayList<>();
+        StringBuilder sql = new StringBuilder( "select u.*,l.mscv,l.academicTitle,l.researchField,s.mssv,s.className,s.major,s.gpa,s.skills,s.phone from Users u left join Students s on u.id=s.userId left join Lecturers l on l.userId=u.id WHERE 1=1  ");
+        
+        if (name != null && !name.isBlank()) {
+            sql.append(" AND (u.fullName LIKE ? OR u.email LIKE ? OR l.mscv LIKE ? OR s.mssv LIKE ?)");
+        }
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            
+            if (name != null && !name.isBlank()) {
+                ps.setString(paramIndex++, "%" + name + "%");
+                ps.setString(paramIndex++, "%" + name + "%");
+                ps.setString(paramIndex++, "%" + name + "%");
+                ps.setString(paramIndex++, "%" + name + "%");
+            }            
+            try(ResultSet rs = ps.executeQuery()){
+                while (rs.next()) {
+                    AdminInformationRequest info =new AdminInformationRequest();
+                    info.setId(rs.getInt("id"));
+                    info.setUsername(rs.getString("username"));
+                    info.setPassword(rs.getString("password"));
+                    info.setEmail(rs.getString("email"));
+                    info.setFullName(rs.getNString("fullName"));
+                    info.setRole(rs.getString("role"));
+                    info.setCreatedAt(rs.getTimestamp("createdAt"));
+                    info.setIsActive(rs.getBoolean("isActive"));
+                    if(rs.getString("mscv") != null){
+                        info.setMscv(rs.getString("mscv"));
+                    }
+                    if(rs.getNString("academicTitle") != null){
+                        info.setAcademicTitle(rs.getNString("academicTitle"));
+                    }
+                    if(rs.getNString("researchField") != null){
+                        info.setResearchField(rs.getNString("researchField"));
+                    }
+                    if(rs.getString("mssv") != null){
+                        info.setMssv(rs.getString("mssv"));
+                    }
+                    if(rs.getNString("className") != null){
+                        info.setClassName(rs.getNString("className"));
+                    }
+                    if(rs.getNString("major") != null){
+                        info.setMajor(rs.getNString("major"));
+                    }
+                    if(rs.getBigDecimal("gpa") != null){
+                        info.setGpa(rs.getBigDecimal("gpa"));
+                    }
+                    if(rs.getNString("skills") != null){
+                        info.setSkills(rs.getNString("skills"));
+                    }                
+                    if(rs.getString("phone") != null){
+                        info.setPhone(rs.getString("phone"));
+                    }
+
+                    infos.add(info);                
+                }
+            }
+            LOGGER.log(Level.INFO, "Retrieved {0} users", infos.size());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting all users", e);
+        }
+        return infos;
+    }    
+        
 
     public boolean createUser(User user) {
         LOGGER.log(Level.INFO, "Creating new user: username={0}, email={1}, roleId={2}", 

@@ -83,8 +83,8 @@
         <nav class="nav flex-column">
             <a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-link"><i class="bi bi-grid-1x2"></i> Dashboard</a>
             <a href="${pageContext.request.contextPath}/admin/list" class="nav-link"><i class="bi bi-people"></i> Quản lý User</a>
-            <a href="#" class="nav-link active"><i class="bi bi-journal-text"></i> Đề tài</a>
-            <a href="#" class="nav-link"><i class="bi bi-layers"></i> Đồ án</a>
+            <a href="${pageContext.request.contextPath}/admin/topic" class="nav-link"><i class="bi bi-journal-text"></i> Đề tài</a>
+            <a href="${pageContext.request.contextPath}/admin/thesis" class="nav-link"><i class="bi bi-layers"></i> Đồ án</a>
             <hr class="text-secondary mx-2">
             <a href="${pageContext.request.contextPath}/admin/logout" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i> Đăng xuất</a>
         </nav>

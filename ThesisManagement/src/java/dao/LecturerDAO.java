@@ -1,6 +1,7 @@
 package dao;
 
 import dal.DBContext;
+import dto.StudentProfileRequestDTO;
 import model.Lecturer;
 import model.User;
 import java.sql.*;
@@ -158,19 +159,55 @@ public class LecturerDAO {
         }
     }
 
+
     public boolean updateLecturer(Lecturer lecturer) {
-        String sql = "UPDATE Lecturers SET fullName = ?, academicTitle = ?, researchField = ?, "
+        String sqlUser = "UPDATE Users SET fullName = ? WHERE id = (SELECT userId FROM Lecturers WHERE mscv = ?)";
+        String sqlLecturer = "UPDATE Lecturers SET fullName = ?, academicTitle = ?, researchField = ?, "
                 + "maxStudents = ?, email = ? WHERE mscv = ?";
+
+        Connection conn = null;
+        try {
+            conn = dbContext.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
+                psUser.setString(1, lecturer.getFullName());
+                psUser.setString(2, lecturer.getMscv());
+                psUser.executeUpdate();
+            }
+            try (PreparedStatement ps = conn.prepareStatement(sqlLecturer)) {
+                ps.setNString(1, lecturer.getFullName());
+                ps.setNString(2, lecturer.getAcademicTitle());
+                ps.setNString(3, lecturer.getResearchField());
+                ps.setInt(4, 5);
+                ps.setString(5, lecturer.getEmail());
+                ps.setString(6, lecturer.getMscv());
+                ps.executeUpdate();
+            }
+
+            conn.commit(); 
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+            return false;
+        }
+    }        
+    
+    public boolean updateLecturerByUserId(Lecturer lecturer) {
+        String sql = "UPDATE Lecturers SET mscv = ?, fullName = ?, academicTitle = ?, researchField = ?, "
+                + "email = ? WHERE userId =?";
         
         try (Connection conn = dbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setNString(1, lecturer.getFullName());
-            ps.setNString(2, lecturer.getAcademicTitle());
-            ps.setNString(3, lecturer.getResearchField());
-            ps.setInt(4, lecturer.getMaxStudents());
+            ps.setString(1, lecturer.getMscv());
+            ps.setNString(2, lecturer.getFullName());
+            ps.setNString(3, lecturer.getAcademicTitle());
+            ps.setNString(4, lecturer.getResearchField());
             ps.setString(5, lecturer.getEmail());
-            ps.setString(6, lecturer.getMscv());
+            ps.setInt(6, lecturer.getUserId());
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -178,7 +215,6 @@ public class LecturerDAO {
             return false;
         }
     }
-
 
     private Lecturer mapLecturer(ResultSet rs) throws SQLException {
         Lecturer lecturer = new Lecturer();

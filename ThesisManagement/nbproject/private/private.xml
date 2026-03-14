@@ -6,6 +6,8 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/WEB-INF/web.xml</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/reset-password.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/dashboard.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/thesis-history.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBContext.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/AppointmentDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Student.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AdminController.java</file>
@@ -21,10 +23,13 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/ResetTokenDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AddingUserRequest.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/dashboard.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/guided-student-list.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/TopicDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/.gitignore</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBInitializer.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/User.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/appointment.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/thesis-list.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/dashboard.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/topic-manage.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/profile.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/UserDAO.java</file>
@@ -33,13 +38,13 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AdminInformationRequest.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/topic-list.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/ThesisDAO.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/TopicResponseDTO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/StudentController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/filter/AuthFilter.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/LecturerController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/LecturerDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/.env</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/profile.jsp</file>
-            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/user-form.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/service/EmailService.java</file>
         </group>
     </open-files>

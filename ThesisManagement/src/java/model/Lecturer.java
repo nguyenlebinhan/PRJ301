@@ -31,6 +31,16 @@ public class Lecturer {
         this.email = email;
     }
 
+    public Lecturer(String mscv, String fullName, String academicTitle, String researchField, String email) {
+        this.mscv = mscv;
+        this.fullName = fullName;
+        this.academicTitle = academicTitle;
+        this.researchField = researchField;
+        this.email = email;
+    }
+    
+    
+
     public String getMscv() {
         return mscv;
     }

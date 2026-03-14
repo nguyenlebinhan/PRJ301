@@ -67,24 +67,7 @@
                             <small class="text-muted d-block">Giảng viên hướng dẫn</small>
                             <span class="fw-bold">${not empty supervisorName ? supervisorName : 'Chưa có'}</span>
                         </div>
-                    </div>    
-                    <c:if test="${not empty supervisorName}">
-                        
-                        <c:choose>
-                            <c:when test="${not empty acceptedTopics.thesisId && acceptedTopics.thesisId != 0}">
-                                <button class="btn btn-sm btn-primary rounded-pill" data-bs-toggle="modal" data-bs-target="#appointmentModal">
-                                    <i class="fas fa-calendar-plus"></i> Đặt lịch 
-                                </button>
-                            </c:when>
-                            <c:otherwise>
-                                <%-- Nếu chưa có Thesis, hiển thị nút bị vô hiệu hóa kèm thông báo --%>
-                                <button class="btn btn-sm btn-secondary rounded-pill" 
-                                        onclick="Swal.fire('Thông báo', 'Bạn cần khởi tạo Đề tài (Nộp luận án lần đầu) trước khi đặt lịch hẹn với giảng viên!', 'warning')">
-                                    <i class="fas fa-calendar-plus"></i> Đặt lịch
-                                </button>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:if>                 
+                    </div>                  
                 </div>
             </div>
             <div class="col-md-4">

@@ -28,6 +28,8 @@ public class LecturerController extends HttpServlet {
     private final ThesisHistoryDAO thesisHistoryDAO = new ThesisHistoryDAO();
     private final EmailService emailService = new EmailService();
     private final AppointmentDAO appointmentDAO = new AppointmentDAO();
+    private final UserDAO userDAO = new UserDAO();
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -61,7 +63,7 @@ public class LecturerController extends HttpServlet {
                     getGuidedStudent(request,response,user);
                     break; 
                 case "/profile":
-                    showLecturerProfile(request,response);
+                    showLecturerProfile(request,response,user);
                     break;
                 case "/thesis/history":
                     showStudentThesisHistory(request,response);
@@ -70,7 +72,7 @@ public class LecturerController extends HttpServlet {
                     showAppointment(request,response,user);
                     break;
                 default:
-                    response.sendRedirect(request.getContextPath() + "/lecturer/topics");
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
             }
         } catch (Exception e) {
@@ -115,6 +117,11 @@ public class LecturerController extends HttpServlet {
                 case "/send-email":
                     handleSendEmail(request,response);
                     break;
+                case "/profile/update":
+                    handleUpdateProfile(request,response,user);
+                    break;
+                case "/profile/deactivate":
+                    handleDeactiveUser(request,response,user);
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -143,8 +150,10 @@ public class LecturerController extends HttpServlet {
         request.setAttribute("lecturer", lecturer);
         request.getRequestDispatcher("/jsp/lecturer/dashboard.jsp").forward(request, response);
     }
-    private void showLecturerProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getRequestDispatcher("jsp/lecturer/profile.jsp").forward(request, response);
+    private void showLecturerProfile(HttpServletRequest request, HttpServletResponse response,User user) throws ServletException, IOException {
+        Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
+        request.setAttribute("lecturer", lecturer);
+        request.getRequestDispatcher("/jsp/lecturer/profile.jsp").forward(request, response);
     }    
 
     // --- CÁC HÀM XỬ LÝ NGHIỆP VỤ ---
@@ -220,6 +229,43 @@ public class LecturerController extends HttpServlet {
             return;
         }
     }
+    private void handleDeactiveUser(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+        try {
+            boolean isDeactivated = userDAO.deactivateUser(user.getId());
+            if(isDeactivated){
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.invalidate(); 
+                }
+                request.getSession(true).setAttribute("success", "Tài khoản của bạn đã được vô hiệu hóa thành công.");
+                response.sendRedirect(request.getContextPath() + "/auth/login");                
+            } else {
+                request.getSession().setAttribute("error", "Không thể vô hiệu hóa tài khoản lúc này.");
+                response.sendRedirect(request.getHeader("Referer"));
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi vô hiệu hóa user id: " + user.getId(), e);
+            response.sendRedirect(request.getContextPath() + "/auth/login?error=system_error");
+        }          
+    }    
+
+    private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response,User user) throws ServletException, IOException {
+        Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
+        String fullName = request.getParameter("fullName");
+        String email = request.getParameter("email");
+        String academicTitle = request.getParameter("academicTitle");
+        String researchField = request.getParameter("researchField");
+        Lecturer updatedLecturer = new Lecturer(lecturer.getMscv(),fullName,academicTitle,researchField,email);
+        boolean isUpdated = lecturerDao.updateLecturer(updatedLecturer);
+        if(isUpdated){
+            request.getSession().setAttribute("success", "Cập nhật người dùng thành công");
+        }else{
+            request.getSession().setAttribute("error", "Cập nhật thất bại");
+        }
+        response.sendRedirect(request.getContextPath()+"/lecturer/profile");
+    }
+    
     
     private void handleAddTopic(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
         try {
@@ -427,6 +473,5 @@ public class LecturerController extends HttpServlet {
         request.setAttribute("pendingAppointments", appointments);
         request.getRequestDispatcher("/jsp/lecturer/appointment.jsp").forward(request, response);
     }
-
 
 }

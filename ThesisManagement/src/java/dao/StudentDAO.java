@@ -145,24 +145,39 @@ public class StudentDAO {
         }                
     }
     
-    public boolean updateProfileStudent(StudentProfileRequestDTO student) {
-        String sql = "UPDATE Students SET fullName = ?, className = ?, major = ?, "
-                + "skills = ?, email = ?, phone = ? WHERE mssv = ?";
-        
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
-            ps.setNString(1, student.getFullName());
-            ps.setNString(2, student.getClassName());
-            ps.setNString(3, student.getMajor());
-            ps.setNString(4, student.getSkills());
-            ps.setString(5, student.getEmail());
-            ps.setString(6, student.getPhone());
-            ps.setString(7, student.getMssv());
-            
-            return ps.executeUpdate() > 0;
+    
+    public boolean updateFullProfile(StudentProfileRequestDTO student) {
+        String sqlUser = "UPDATE Users SET fullName = ? WHERE id = (SELECT userId FROM Students WHERE mssv = ?)";
+        String sqlStudent = "UPDATE Students SET fullName = ?, className = ?, major = ?, skills = ?, email = ?, phone = ? WHERE mssv = ?";
+
+        Connection conn = null;
+        try {
+            conn = dbContext.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
+                psUser.setString(1, student.getFullName());
+                psUser.setString(2, student.getMssv());
+                psUser.executeUpdate();
+            }
+            try (PreparedStatement psStudent = conn.prepareStatement(sqlStudent)) {
+                psStudent.setString(1, student.getFullName());
+                psStudent.setString(2, student.getClassName());
+                psStudent.setString(3, student.getMajor());
+                psStudent.setString(4, student.getSkills());
+                psStudent.setString(5, student.getEmail());
+                psStudent.setString(6, student.getPhone());
+                psStudent.setString(7, student.getMssv());
+                psStudent.executeUpdate();
+            }
+
+            conn.commit(); 
+            return true;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error updating student", e);
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
             return false;
         }
     }    

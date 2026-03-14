@@ -224,10 +224,6 @@
                     <a href="${pageContext.request.contextPath}/lecturer/GuidedStudentList" class="btn btn-outline-secondary text-start">
                         <i class="fas fa-users-cog me-2"></i> Quản lý sinh viên hướng dẫn
                     </a>
-                    <hr>
-                    <a href="${pageContext.request.contextPath}/lecturer/appointment" class="btn btn-outline-info text-start">
-                        <i class="fas fa-calendar-alt me-2"></i> Lịch hẹn hướng dẫn
-                    </a>
                 </div>
             </div>
         </div>

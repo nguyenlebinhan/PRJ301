@@ -9,6 +9,7 @@ import dao.TopicRegistrationDAO;
 import dao.UserDAO;
 import dto.AddingUserRequest;
 import dto.AdminInformationRequest;
+import dto.StudentProgressDTO;
 import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -71,7 +72,10 @@ public class AdminController extends HttpServlet {
                     break;
                 case "/logout":
                     logoutUser(request,response);
-                    break;                    
+                    break;  
+                case "/thesis":
+                    showThesis(request,response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -98,6 +102,9 @@ public class AdminController extends HttpServlet {
                     break;
                 case "/addUser":
                     addUser(request,response);
+                    break;
+                case "topic/edit":
+                    handleEditTopic(request,response);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -145,6 +152,7 @@ public class AdminController extends HttpServlet {
         
         addingUserRequest.setPassword(request.getParameter("password"));
         addingUserRequest.setRole(request.getParameter("role"));
+        addingUserRequest.setPhone(request.getParameter("phone"));
         
         // BUG FIX: Set MSSV and MSCV BEFORE validation
         addingUserRequest.setMssv(request.getParameter("mssv"));
@@ -160,6 +168,7 @@ public class AdminController extends HttpServlet {
         LOGGER.log(Level.INFO, "FullName: {0}", addingUserRequest.getFullName());
         LOGGER.log(Level.INFO, "Role: {0}", addingUserRequest.getRole());
         LOGGER.log(Level.INFO, "MSSV: {0}", addingUserRequest.getMssv());
+        LOGGER.log(Level.INFO, "Phone: {0}", addingUserRequest.getPhone());
         LOGGER.log(Level.INFO, "ClassName: {0}", addingUserRequest.getClassName());
         LOGGER.log(Level.INFO, "Major: {0}", addingUserRequest.getMajor());
         LOGGER.log(Level.INFO, "MSCV: {0}", addingUserRequest.getMscv());
@@ -221,6 +230,7 @@ public class AdminController extends HttpServlet {
             student.setClassName(addingUserRequest.getClassName());
             student.setMajor(addingUserRequest.getMajor());
             student.setEmail(addingUserRequest.getEmail());
+            student.setPhone(addingUserRequest.getPhone());
             
             if (!studentDao.createStudent(student)) {
                 LOGGER.log(Level.WARNING, "Student creation failed: MSSV already exists: {0}", addingUserRequest.getMssv());
@@ -284,9 +294,14 @@ public class AdminController extends HttpServlet {
     
     private void displayUsers(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-      
-        // Gọi DAO lấy danh sách (giả sử dùng các giá trị mặc định cho phân trang)
-        List<AdminInformationRequest> listUser = userDAO.getAllInformation();
+        String query = request.getParameter("query");
+        List<AdminInformationRequest> listUser;
+
+        if (query != null && !query.trim().isEmpty()) {
+            listUser = userDAO.searchUser(query.trim());
+        } else {
+            listUser = userDAO.getAllInformation();
+        }        
         request.setAttribute("listUser", listUser);
         request.getRequestDispatcher("/jsp/admin/user-list.jsp").forward(request, response);
     }
@@ -301,23 +316,32 @@ public class AdminController extends HttpServlet {
         request.getRequestDispatcher("/jsp/admin/user-form.jsp").forward(request, response);
     }
 
+    private void showThesis(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+           
+        String query = request.getParameter("query");
+        List<StudentProgressDTO> studentProgress;
+
+        if (query != null && !query.trim().isEmpty()) {
+            studentProgress = thesisDAO.searchThesis(query.trim());
+        } else {
+            studentProgress = thesisDAO.getAllStudentProgress();
+        }        
+        request.setAttribute("listThesis", studentProgress);
+        request.getRequestDispatcher("/jsp/admin/thesis-list.jsp").forward(request, response);        
+    }    
+    
+    private void handleEditTopic(HttpServletRequest request, HttpServletResponse response) {
+        
+    }    
+
     private void updateUser(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
+            throws IOException, ServletException {
         int id = Integer.parseInt(request.getParameter("id"));
         String username = request.getParameter("username");
         String fullName = request.getParameter("fullName");
         String role = request.getParameter("role");
-        String mssv = request.getParameter("mssv");
-        String className = request.getParameter("className");
-        String major = request.getParameter("major");
         String email = request.getParameter("email");
-        int isActive = Integer.parseInt(request.getParameter("isActive"));
-        BigDecimal gpa = new BigDecimal(request.getParameter("gpa"));
-        String skills = request.getParameter("skills");
-        String phone = request.getParameter("phone");
-        String mscv = request.getParameter("mscv");
-        String academicTitle = request.getParameter("academicTitle");
-        String researchField = request.getParameter("researchField");
+        int isActive = Integer.parseInt(request.getParameter("active"));
 
         User user = new User();
         user.setUsername(username);
@@ -334,6 +358,12 @@ public class AdminController extends HttpServlet {
         if (userDAO.updateUser(user)) {
             User updatedUser = userDAO.getUserByUsername(username);
             if(updatedUser.getRole().equals("STUDENT")){
+                String mssv = request.getParameter("mssv");
+                String className = request.getParameter("className");
+                String major = request.getParameter("major");    
+                BigDecimal gpa = new BigDecimal(request.getParameter("gpa"));
+                String skills = request.getParameter("skills");
+                String phone = request.getParameter("phone");                
                 Student student = new Student();
                 student.setMssv(mssv);
                 student.setUserId(id);
@@ -347,13 +377,33 @@ public class AdminController extends HttpServlet {
                 boolean isUpdated = studentDao.updateStudentByUserId(student);
                 if(isUpdated){
                     request.getSession().setAttribute("success", "Update thành công");
-                    response.sendRedirect("");
-                }
-                                
+                    response.sendRedirect(request.getContextPath()+"/admin/list?msg=update_success");
+                }else{
+                    request.getSession().setAttribute("error", "MSSV đã tồn tại");
+                    response.sendRedirect(request.getContextPath()+"/admin/list?msg=update_fail");
+                }                              
+            }else if (updatedUser.getRole().equals("LECTURER")) {
+                String mscv = request.getParameter("mscv");
+                String academicTitle = request.getParameter("academicTitle");
+                String researchField = request.getParameter("researchField");    
+                Lecturer lecturer = new Lecturer();
+                lecturer.setUserId(id);
+                lecturer.setMscv(mscv);
+                lecturer.setAcademicTitle(academicTitle);
+                lecturer.setResearchField(researchField);
+                lecturer.setFullName(fullName);
+                lecturer.setEmail(email);
+                boolean isUdpdated = lecturerDao.updateLecturerByUserId(lecturer); 
+                if(isUdpdated){
+                    request.getSession().setAttribute("success", "Update thành công");
+                    response.sendRedirect(request.getContextPath()+"/admin/list?msg=update_success");
+                }else{
+                    request.getSession().setAttribute("error", "MSCV đã tồn tại");
+                    response.sendRedirect(request.getContextPath()+"/admin/list?msg=update_fail");
+                }                   
+            }else{
+                response.sendRedirect(request.getContextPath()+"/admin/list");
             }
-            response.sendRedirect("list?msg=update_success");
-        } else {
-            response.sendRedirect("edit?id=" + id + "&error=1");
         }
     }
 
@@ -361,8 +411,10 @@ public class AdminController extends HttpServlet {
             throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         if (userDAO.deleteUser(id)) {
+            request.getSession().setAttribute("success", "Xóa thành công");
             response.sendRedirect("list?msg=delete_success");
         } else {
+            request.getSession().setAttribute("error", "Xóa thất bại");
             response.sendRedirect("list?error=delete_fail");
         }
     }

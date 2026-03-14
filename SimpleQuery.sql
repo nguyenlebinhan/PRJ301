@@ -24,7 +24,6 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Chèn dữ liệu từ bảng 'inserted' (chứa các dòng vừa được thêm) vào ThesisHistory
     INSERT INTO ThesisHistory (
         thesisId, 
         mssv, 
@@ -45,7 +44,7 @@ BEGIN
         i.mssv, 
         i.reportFile, 
         i.sourceCodeLink, 
-        GETDATE(), -- Lấy thời gian hiện tại của hệ thống
+        GETDATE(),
         i.similarityScore,
         i.plagiarismStatus,
         i.bestSource,

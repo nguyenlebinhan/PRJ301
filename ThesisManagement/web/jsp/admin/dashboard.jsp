@@ -257,7 +257,6 @@
                             <th>Thành viên</th>
                             <th>Vai trò</th>
                             <th>Ngày tham gia</th>
-                            <th class="text-end">Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -276,11 +275,6 @@
                                     <span class="badge-role bg-light text-dark border">${u.role}</span>
                                 </td>
                                 <td class="text-muted small">${u.createdAt}</td>
-                                <td class="text-end">
-                                    <a href="${pageContext.request.contextPath}/admin/edit?id=${u.id}" class="btn btn-icon btn-sm btn-outline-secondary border-0">
-                                        <i class="bi bi-pencil-square"></i> Sửa
-                                    </a>
-                                </td>
                             </tr>
                         </c:forEach>
                     </tbody>

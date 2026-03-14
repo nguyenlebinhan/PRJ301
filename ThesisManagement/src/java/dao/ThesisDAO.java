@@ -1,6 +1,7 @@
 package dao;
 
 import dal.DBContext;
+import dto.AdminInformationRequest;
 import dto.StudentProgressDTO;
 import dto.ThesisUpdateRequest;
 import dto.TopicThesisDTO;
@@ -83,6 +84,54 @@ public class ThesisDAO {
         }
         return studentList;
     }
+    public List<StudentProgressDTO> getAllStudentProgress(){
+        List<StudentProgressDTO> studentList = new ArrayList<>();
+        String sql = "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where 1=1";
+        try(Connection conn = dbContext.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+                    studentList.add(s);
+                }
+            }
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE,"Error getting student progress : ",e);
+        }
+        return studentList;
+    } 
+
+    public List<StudentProgressDTO> searchThesis(String query ) {
+        LOGGER.log(Level.INFO, "Search users");
+        
+        List<StudentProgressDTO> studentList = new ArrayList<>();
+        StringBuilder sql = new StringBuilder( "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where 1=1  ");
+        
+        if (query != null && !query.isBlank()) {
+            sql.append(" AND (s.thesisCode LIKE ? OR s.mssv LIKE ?)");
+        }
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            
+            if (query != null && !query.isBlank()) {
+                ps.setString(paramIndex++, "%" + query + "%");
+                ps.setString(paramIndex++, "%" + query + "%");
+            }            
+            try(ResultSet rs = ps.executeQuery()){
+                while (rs.next()) {
+                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+
+                    studentList.add(s);                
+                }
+            }
+            LOGGER.log(Level.INFO, "Retrieved {0} theses", studentList.size());
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error getting all theses", e);
+        }
+        return studentList;
+    }       
 
     public Thesis getThesisByStudent(String mssv) {
         String sql = "SELECT * FROM Theses WHERE mssv = ?";

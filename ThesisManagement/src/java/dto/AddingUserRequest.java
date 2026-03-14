@@ -15,6 +15,7 @@ public class AddingUserRequest {
     private String password;
     private String role;
     private String mssv;
+    private String phone;
     private String className;
     private String major;
     private String mscv;
@@ -24,19 +25,21 @@ public class AddingUserRequest {
     public AddingUserRequest() {
     }
 
-    public AddingUserRequest(String fullName, String username, String email, String password, String role, String mssv, String className, String major, String mscv, String academicTitle, String researchField) {
+    public AddingUserRequest(String fullName, String username, String email, String password, String role, String mssv, String phone, String className, String major, String mscv, String academicTitle, String researchField) {
         this.fullName = fullName;
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
         this.mssv = mssv;
+        this.phone = phone;
         this.className = className;
         this.major = major;
         this.mscv = mscv;
         this.academicTitle = academicTitle;
         this.researchField = researchField;
     }
+
 
     public String getFullName() {
         return fullName;
@@ -124,6 +127,14 @@ public class AddingUserRequest {
 
     public void setResearchField(String researchField) {
         this.researchField = researchField;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
     
     

@@ -136,9 +136,6 @@ public class StudentController extends HttpServlet {
             case "/profile/deactivate":
                 handleDeactiveUser(request,response,user);
                 break;
-            case "/appointment/create":
-                createAppointment(request,response,user);
-                break;
             default:
                 //response.sendError(404);
                 break;
@@ -245,7 +242,7 @@ public class StudentController extends HttpServlet {
                 student.getMssv(), fullName, className, major, skills, email, phone
             );
 
-            boolean isUpdated = studentDAO.updateProfileStudent(updatedStudent);
+            boolean isUpdated = studentDAO.updateFullProfile(updatedStudent);
 
             if (isUpdated) {
                 session.setAttribute("success", "Cập nhật thành công profile.");
@@ -256,7 +253,6 @@ public class StudentController extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Lỗi khi xử lý cập nhật Profile", e);
             session.setAttribute("error", "Hệ thống gặp sự cố kỹ thuật.");
         } finally {
-            // Chỉ gọi Redirect duy nhất MỘT LẦN ở đây
             if (!response.isCommitted()) {
                 response.sendRedirect(redirectPath);
             }
@@ -383,101 +379,6 @@ public class StudentController extends HttpServlet {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Lỗi upload file", e);
             response.sendRedirect(request.getContextPath() + "/student/dashboard?error=upload");
-        }
-    }
-    private void createAppointment(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
-        // Log bắt đầu luồng xử lý
-        LOGGER.log(Level.INFO, "Bắt đầu yêu cầu tạo lịch hẹn cho User ID: {0}", user.getId());
-
-        try {
-            // 1. Lấy thông tin sinh viên
-            Student student = studentDAO.getStudentByUserId(user.getId());
-            if (student == null) {
-                LOGGER.log(Level.WARNING, "Không tìm thấy Student cho User ID: {0}", user.getId());
-                throw new Exception("Không tìm thấy thông tin sinh viên.");
-            }
-
-            // 2. Lấy giảng viên và đề tài
-            Lecturer supervisor = topicRegistrationDao.getLecturerByMssv(student.getMssv());
-            TopicThesisDTO topicThesis = topicDao.getAcceptedTopic(student.getMssv());
-
-            if (supervisor == null || topicThesis == null) {
-                LOGGER.log(Level.WARNING, "Yêu cầu bị từ chối: MSSV {0} thiếu GVHD hoặc Đề tài được duyệt.", student.getMssv());
-                request.setAttribute("error", "Bạn chưa có giảng viên hướng dẫn hoặc đề tài được duyệt!");
-                showDashboard(request, response, user);
-                return;
-            }
-
-            // 3. Nhận dữ liệu từ form
-            String purpose = request.getParameter("purpose");
-            String location = request.getParameter("location");
-            String dateStr = request.getParameter("appointmentDate");
-            String timeStr = request.getParameter("appointmentTime");
-
-            // Log dữ liệu đầu vào (không log password hay thông tin nhạy cảm)
-            LOGGER.log(Level.INFO, "Dữ liệu nhận được: MSSV={0}, Date={1}, Time={2}, Location={3}", 
-                      new Object[]{student.getMssv(), dateStr, timeStr, location});
-
-            
-            java.sql.Timestamp meetingTimestamp = null;
-            try {
-                
-                String fullDateTimeStr = dateStr + " " + timeStr + ":00"; 
-                meetingTimestamp = java.sql.Timestamp.valueOf(fullDateTimeStr);
-
-                LOGGER.log(Level.INFO, "Converted Timestamp: {0}", meetingTimestamp);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Lỗi định dạng DateTime: " + dateStr + " " + timeStr, e);
-                throw new Exception("Định dạng ngày giờ không hợp lệ (Yêu cầu yyyy-MM-dd HH:mm).");
-            }
-
-            
-            Appointment app = new Appointment();
-
-            app.setMssv(student.getMssv());
-
-            app.setMscv(supervisor.getMscv());
-
-
-            // KIỂM TRA CHẶN LỖI TẠI ĐÂY
-            if (topicThesis == null || topicThesis.getThesisId() == null) {
-                LOGGER.log(Level.WARNING, "Không thể tạo lịch hẹn. MSSV {0} chưa có bản ghi trong bảng Theses.", student.getMssv());
-
-                // Gửi thông báo lỗi về cho người dùng thay vì để chương trình bị Crash
-                request.getSession().setAttribute("error", "Lỗi: Đồ án của bạn chưa được khởi tạo chính thức trên hệ thống. Vui lòng liên hệ Giảng viên hướng dẫn!");
-                response.sendRedirect(request.getContextPath() + "/student/dashboard");
-                return;
-            }
-
-            // Nếu đã có thesisId hợp lệ, tiến hành set vào Appointment
-            app.setThesisId(topicThesis.getThesisId());
-            app.setThesisId(topicThesis.getThesisId());
-
-            app.setPurpose(purpose);
-
-            app.setMeetingDate(meetingTimestamp); 
-
-            app.setLocation(location);
-
-            app.setStatus("Pending");
-
-            boolean isSuccess = appointmentDAO.createAppointment(app);
-
-            if (isSuccess) {
-                LOGGER.log(Level.INFO, "Tạo lịch hẹn thành công trong Database cho MSSV: {0}", student.getMssv());
-                request.getSession().setAttribute("success", "Đặt lịch hẹn thành công!");
-                response.sendRedirect(request.getContextPath() + "/student/dashboard?msg=success");
-            } else {
-                LOGGER.log(Level.SEVERE, "Database trả về false khi lưu Appointment cho MSSV: {0}", student.getMssv());
-                request.setAttribute("error", "Không thể lưu lịch hẹn vào cơ sở dữ liệu.");
-                showDashboard(request, response, user);
-            }
-
-        } catch (Exception e) {
-            // Log chi tiết StackTrace để biết chính xác dòng nào lỗi
-            LOGGER.log(Level.SEVERE, "Ngoại lệ xảy ra trong createAppointment: " + e.getMessage(), e);
-            request.setAttribute("error", "Đã xảy ra lỗi: " + e.getMessage());
-            showDashboard(request, response, user);
         }
     }
     private void handleRegisterTopic(HttpServletRequest request, HttpServletResponse response, User user) 
