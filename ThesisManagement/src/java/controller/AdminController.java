@@ -76,6 +76,9 @@ public class AdminController extends HttpServlet {
                 case "/thesis":
                     showThesis(request,response);
                     break;
+                case "/topic/delete":
+                    deleteTopic(request,response);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -103,9 +106,9 @@ public class AdminController extends HttpServlet {
                 case "/addUser":
                     addUser(request,response);
                     break;
-                case "topic/edit":
-                    handleEditTopic(request,response);
-                    break;
+                case "/topic/update":
+                    handleUpdateTopic(request,response);
+                    break;    
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -290,7 +293,24 @@ public class AdminController extends HttpServlet {
         request.setAttribute("listTopic", list);
         request.getRequestDispatcher("/jsp/admin/topic-list.jsp").forward(request, response);
 
-    }    
+    }   
+    private void deleteTopic(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            int topicId = Integer.parseInt(request.getParameter("id"));
+
+            HttpSession session = request.getSession(false);
+            User user = (User) session.getAttribute("user");
+
+
+            if (topicDAO.deleteTopicByAdmin(topicId)) {
+                response.sendRedirect(request.getContextPath() + "/admin/topic?msg=delete_success");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/admin/topic?error=delete_failed");
+            }
+        } catch (Exception e) {
+            response.sendRedirect(request.getContextPath() + "/admin/topic?error=invalid_id");
+        }
+    }     
     
     private void displayUsers(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -330,9 +350,22 @@ public class AdminController extends HttpServlet {
         request.getRequestDispatcher("/jsp/admin/thesis-list.jsp").forward(request, response);        
     }    
     
-    private void handleEditTopic(HttpServletRequest request, HttpServletResponse response) {
-        
-    }    
+    private void handleUpdateTopic(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Topic topic = new Topic();
+        topic.setTopicId(Integer.parseInt(request.getParameter("topicId")));
+        topic.setTitle(request.getParameter("title"));
+        topic.setDescription(request.getParameter("description"));
+        topic.setTechnicalRequirements(request.getParameter("technicalRequirements"));
+        topic.setStatus(request.getParameter("status"));
+        topic.setDifficultyScore(new java.math.BigDecimal(request.getParameter("difficultyScore")));
+        topic.setCreatedBy(request.getParameter("mscv"));
+
+        if (topicDAO.updateTopic(topic)) {
+            response.sendRedirect(request.getContextPath() + "/admin/topic?msg=updated");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/admin/topic?error=update_fail");
+        }        
+    }      
 
     private void updateUser(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {

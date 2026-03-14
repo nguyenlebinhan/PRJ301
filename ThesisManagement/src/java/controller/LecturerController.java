@@ -457,10 +457,10 @@ public class LecturerController extends HttpServlet {
             // Lấy thông tin giảng viên để đảm bảo họ chỉ ẩn được đề tài của chính mình
             Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
 
-            if (topicDAO.softDeleteTopic(topicId, lecturer.getMscv())) {
-                response.sendRedirect(request.getContextPath() + "/lecturer/topics?msg=hidden_success");
+            if (topicDAO.deleteTopic(topicId, lecturer.getMscv())) {
+                response.sendRedirect(request.getContextPath() + "/lecturer/topics?msg=delete_success");
             } else {
-                response.sendRedirect(request.getContextPath() + "/lecturer/topics?error=hide_failed");
+                response.sendRedirect(request.getContextPath() + "/lecturer/topics?error=delete_failed");
             }
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/lecturer/topics?error=invalid_id");

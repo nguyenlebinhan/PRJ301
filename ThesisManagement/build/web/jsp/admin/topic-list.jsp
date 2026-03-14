@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     
     <style>
         :root {
@@ -142,12 +143,15 @@
                                     </c:choose>
                                 </td>
                                 <td class="text-end">
-                                    <a href="topic/edit?id=${t.topicId}" class="btn btn-action btn-light text-primary me-1">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </a>
-                                    <a href="topic/delete?id=${t.topicId}" class="btn btn-action btn-light text-danger" onclick="return confirm('Xóa đề tài này?')">
-                                        <i class="bi bi-trash3-fill"></i>
-                                    </a>
+                                    <button class="btn btn-sm btn-outline-warning me-1" 
+                                            onclick="editTopic('${t.topicId}', '${t.topicCode}','${t.description}','${t.technicalRequirements}' ,'${t.title}', '${t.status}', '${t.difficultyScore}','${t.lecturer.mscv}')">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a href="${pageContext.request.contextPath}/admin/topic/delete?id=${t.topicId}" 
+                                       class="btn btn-sm btn-outline-danger" 
+                                       onclick="return confirm('Bạn có chắc muốn xóa đề tài này khỏi danh sách?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>                                  
                                 </td>
                             </tr>
                         </c:forEach>
@@ -170,7 +174,71 @@
             </div>
         </div>
     </main>
-
+    <div class="modal fade" id="editTopicModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="${pageContext.request.contextPath}/admin/topic/update" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Chỉnh sửa đề tài</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="topicId" id="editTopicId">
+                        <input type="hidden" name="mscv" id="editMscv">
+                        <div class="mb-3">
+                            <label class="form-label">Mã số</label>
+                            <input type="text" class="form-control" id="editTopicCode" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tên đề tài</label>
+                            <input type="text" name="title" class="form-control" id="editTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Mô tả đề tài</label>
+                            <input type="text" name="description" class="form-control" id="editDescription" required>
+                        </div>    
+                        <div class="mb-3">
+                            <label class="form-label">Yêu cầu kỹ thuật</label>
+                            <input type="text" name="technicalRequirements" class="form-control" id="editTechnicalRequirements" required>
+                        </div>                              
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Trạng thái</label>
+                            <select name="status" class="form-select" id="editStatus">
+                                <option value="AVAILABLE">AVAILABLE</option>
+                                <option value="END">END</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Điểm độ khó</label>
+                            <input type="number" name="difficultyScore" min="1" max="5" value="5" step="1" class="form-control" id="editDifficultyScore" required >
+                        </div>                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>                
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    function editTopic(id, code, description , technicalRequirements , title, status, difficultyScore,mscv) {
+        // 1. Đổ dữ liệu vào các input trong Modal
+        document.getElementById('editTopicId').value = id;
+        document.getElementById('editTopicCode').value = code;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editTechnicalRequirements').value=technicalRequirements;
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editStatus').value = status;
+        document.getElementById('editDifficultyScore').value = difficultyScore;
+        document.getElementById('editMscv').value = mscv;
+        // 2. Hiển thị Modal
+        var myModal = new bootstrap.Modal(document.getElementById('editTopicModal'));
+        myModal.show();
+    }
+    </script>            
+
 </body>
 </html>

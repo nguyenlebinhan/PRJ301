@@ -50,9 +50,10 @@
                                         </button>
                                         <a href="${pageContext.request.contextPath}/lecturer/topics/delete?id=${t.topicId}" 
                                            class="btn btn-sm btn-outline-danger" 
-                                           onclick="return confirm('Bạn có chắc muốn ẩn đề tài này khỏi danh sách?')">
-                                            <i class="fas fa-eye-slash"></i>
+                                           onclick="return confirm('Bạn có chắc muốn xóa đề tài này khỏi danh sách?')">
+                                            <i class="fas fa-trash"></i>
                                         </a>
+                                           
                                     </td>
                                 </tr>
                             </c:if>

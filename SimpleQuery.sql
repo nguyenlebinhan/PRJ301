@@ -14,6 +14,9 @@ SELECT t.*, l.fullName as lecturerName, l.researchField  FROM Topics t LEFT JOIN
 SELECT t.* from Topics t WHERE t.title LIKE '%B%' 
 Select l.* from TopicRegistrations tr inner join Lecturers l on l.mscv=tr.mscvHD where tr.mssv = 'SV001' and tr.status='ACCEPTED'
 
+DELETE FROM Topics 
+                     WHERE topicId = 3 AND createdBy = 'GV001'
+
 select t.topicId,t.title,t.topicCode,tr.mssv,t.description,t.technicalRequirements,t.difficultyScore,th.thesisId,th.reportFile,th.sourceCodeLink from TopicRegistrations tr INNER JOIN Topics t on tr.topicId = t.topicId left join Theses th on th.topicId=t.topicId WHERE tr.mssv = 'SV001' AND tr.status = 'ACCEPTED'
 select * from ThesisHistory ;
 

@@ -323,9 +323,8 @@ public class TopicDAO {
         }
         return list;
     }    
-    public boolean softDeleteTopic(int topicId, String mscv) {
-        // Chúng ta cập nhật status thành 'HIDDEN' thay vì xóa bản ghi
-        String sql = "UPDATE Topics SET status = 'HIDDEN' " +
+    public boolean deleteTopic(int topicId, String mscv) {
+        String sql = "DELETE FROM Topics " +
                      "WHERE topicId = ? AND createdBy = ?";
 
         try (Connection conn = dbContext.getConnection();
@@ -336,10 +335,24 @@ public class TopicDAO {
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Lỗi khi ẩn đề tài ID: " + topicId, e);
+            LOGGER.log(Level.SEVERE, "Lỗi khi xóa tài ID: " + topicId, e);
             return false;
         }
     }
+    public boolean deleteTopicByAdmin(int topicId) {
+        String sql = "DELETE FROM Topics " +
+                     "WHERE topicId = ?";
+
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, topicId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Lỗi khi xóa tài ID: " + topicId, e);
+            return false;
+        }
+    }    
     private Topic mapTopic(ResultSet rs) throws SQLException {
         Topic topic = new Topic();
         topic.setTopicId(rs.getInt("topicId"));
