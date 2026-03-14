@@ -22,17 +22,17 @@ env_path = os.path.join(base_dir, '.env')
 
 
 if load_dotenv(dotenv_path=env_path):
-    print(f"✅ Đã tìm thấy và tải file .env tại: {env_path}")
+    print(f" Đã tìm thấy và tải file .env tại: {env_path}")
 else:
-    print(f"❌ KHÔNG tìm thấy file .env tại: {env_path}")
+    print(f" KHÔNG tìm thấy file .env tại: {env_path}")
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
 if not OPENAI_API_KEY:
-    print("❌ LỖI: Biến OPENAI_API_KEY đang trống!")
+    print(" LỖI: Biến OPENAI_API_KEY đang trống!")
 else:
-    print(f"🚀 Key đã sẵn sàng (4 ký tự đầu): {OPENAI_API_KEY[:4]}")
+    print(f"Key đã sẵn sàng (4 ký tự đầu): {OPENAI_API_KEY[:4]}")
 
 
 client = OpenAI(api_key=OPENAI_API_KEY)

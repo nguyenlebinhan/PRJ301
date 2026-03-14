@@ -84,7 +84,7 @@ public class StudentController extends HttpServlet {
             case "/topics":
                 showTopicList(request,response);
                 break;
-            // Trong doGet, sửa case này:
+            
             case "/topic/register":
                 showTopicRegistration(request, response);
                 break;
@@ -330,13 +330,11 @@ public class StudentController extends HttpServlet {
         try {
             Student student = studentDAO.getStudentByUserId(user.getId());
             Lecturer supervisor = topicRegistrationDao.getLecturerByMssv(student.getMssv());
-
-            // 1. Xử lý Upload File
             String topicName = topicDao.getTopicNameById(Integer.parseInt(request.getParameter("topicId")));
+            
+            
             Part filePart = request.getPart("reportFile");
             String fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-
-            // Đường dẫn lưu file trong thư mục 'uploads' của project
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdir();

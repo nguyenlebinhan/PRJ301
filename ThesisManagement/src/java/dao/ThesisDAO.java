@@ -75,7 +75,7 @@ public class ThesisDAO {
             PreparedStatement ps = conn.prepareStatement(sql)){
             
             try(ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
+                while(rs.next()){
                     AdminListThesis s= new AdminListThesis(rs.getNString("fullName"),rs.getString("mssv"),rs.getNString("className"),rs.getNString("title"),rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
                     theses.add(s);
                 }
