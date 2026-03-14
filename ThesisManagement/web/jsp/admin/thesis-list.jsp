@@ -73,7 +73,7 @@
 <body>
 
     <aside class="sidebar">
-        <div class="sidebar-brand"><i class="bi bi-mortarboard-fill me-2 text-primary"></i> TMS ADMIN</div>
+        <div class="sidebar-brand"><i class="bi bi-mortarboard-fill me-2 text-primary"></i>Thesis Management</div>
         <nav class="nav flex-column">
             <a href="${pageContext.request.contextPath}/admin/dashboard" class="nav-link"><i class="bi bi-grid-1x2"></i> Dashboard</a>
             <a href="${pageContext.request.contextPath}/admin/list" class="nav-link"><i class="bi bi-people"></i> Quản lý User</a>

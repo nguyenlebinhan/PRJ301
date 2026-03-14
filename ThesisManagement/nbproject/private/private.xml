@@ -13,10 +13,10 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AdminController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/StudentDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/user-list.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Thesis.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/utils/ConfigManager.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Lecturer.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/TopicRegistrationDAO.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/register.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/forget-password.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AuthController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/login.jsp</file>
@@ -41,12 +41,14 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/TopicResponseDTO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/AppListener.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/StudentController.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AdminListThesis.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/filter/AuthFilter.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/LecturerController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/LecturerDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/.env</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/profile.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/service/EmailService.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/StudentProgressDTO.java</file>
         </group>
     </open-files>
 </project-private>

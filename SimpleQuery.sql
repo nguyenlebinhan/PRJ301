@@ -79,6 +79,6 @@ select Count(thesisId) as numberOfReport from Theses where mscvHD = ;
 select * from Appointment;
 select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource from Theses th join Students s on s.mssv = th.mssv where th.mscvHD='GV001';
 select * from ResetTokens;
-
+select s.fullName,t.mssv,s.className,th.title,l.fullName,t.reportFile,t.sourceCodeLink,t.similarityScore,t.plagiarismStatus,t.bestSource,t.relevantTopicScore,t.relevantTopicStatus from Theses t inner join Students s on s.mssv=t.mssv inner join Lecturers l on l.mscv=t.mscvHD inner join Topics th on t.topicId = th.topicId 
 select a.appointmentId,a.mssv,a.mscv,tp.title,a.purpose,a.meetingDate,a.location,a.createdAt from Appointment a inner join Theses t on t.thesisId = a.thesisId inner join Topics tp on tp.topicId = t.topicId where mscv = 'GV001' and a.status ='PENDING'
 select u.*,l.mscv,l.academicTitle,l.researchField,s.mssv,s.className,s.major,s.gpa,s.skills,s.phone from Users u left join Students s on u.id=s.userId left join Lecturers l on l.userId=u.id 

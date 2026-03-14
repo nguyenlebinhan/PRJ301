@@ -2,6 +2,7 @@ package dao;
 
 import dal.DBContext;
 import dto.AdminInformationRequest;
+import dto.AdminListThesis;
 import dto.StudentProgressDTO;
 import dto.ThesisUpdateRequest;
 import dto.TopicThesisDTO;
@@ -67,6 +68,23 @@ public class ThesisDAO {
         }
         return null;
     }
+    public List<AdminListThesis> getThesisByAdmin(){
+        List<AdminListThesis> theses = new ArrayList<>();
+        String sql = "select s.fullName,t.mssv,s.className,th.title,l.fullName,t.reportFile,t.sourceCodeLink,t.similarityScore,t.plagiarismStatus,t.bestSource,t.relevantTopicScore,t.relevantTopicStatus from Theses t inner join Students s on s.mssv=t.mssv inner join Lecturers l on l.mscv=t.mscvHD inner join Topics th on th.topicId = t.topicId";
+        try(Connection conn = dbContext.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+            
+            try(ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    AdminListThesis s= new AdminListThesis(rs.getNString("fullName"),rs.getString("mssv"),rs.getNString("className"),rs.getNString("title"),rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+                    theses.add(s);
+                }
+            }
+        }catch(SQLException e){
+            LOGGER.log(Level.SEVERE,"Error getting student progress",e);
+        }
+        return theses;
+    }    
     public List<StudentProgressDTO> getStudentProgress(String mscv){
         List<StudentProgressDTO> studentList = new ArrayList<>();
         String sql = "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where th.mscvHD=?";
@@ -101,14 +119,14 @@ public class ThesisDAO {
         return studentList;
     } 
 
-    public List<StudentProgressDTO> searchThesis(String query ) {
+    public List<AdminListThesis> searchThesis(String query ) {
         LOGGER.log(Level.INFO, "Search users");
         
-        List<StudentProgressDTO> studentList = new ArrayList<>();
-        StringBuilder sql = new StringBuilder( "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where 1=1  ");
+        List<AdminListThesis> theses = new ArrayList<>();
+        StringBuilder sql = new StringBuilder( "select s.fullName,t.mssv,s.className,th.title,l.fullName,t.reportFile,t.sourceCodeLink,t.similarityScore,t.plagiarismStatus,t.bestSource,t.relevantTopicScore,t.relevantTopicStatus from Theses t inner join Students s on s.mssv=t.mssv inner join Lecturers l on l.mscv=t.mscvHD inner join Topics th on th.topicId = t.topicId where 1=1  ");
         
         if (query != null && !query.isBlank()) {
-            sql.append(" AND (s.thesisCode LIKE ? OR s.mssv LIKE ?)");
+            sql.append(" AND (th.title LIKE ? OR t.mssv LIKE ?)");
         }
         try (Connection conn = dbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -121,16 +139,16 @@ public class ThesisDAO {
             }            
             try(ResultSet rs = ps.executeQuery()){
                 while (rs.next()) {
-                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+                    AdminListThesis s= new AdminListThesis(rs.getNString("fullName"),rs.getString("mssv"),rs.getNString("className"),rs.getNString("title"),rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
 
-                    studentList.add(s);                
+                    theses.add(s);                
                 }
             }
-            LOGGER.log(Level.INFO, "Retrieved {0} theses", studentList.size());
+            LOGGER.log(Level.INFO, "Retrieved {0} theses", theses.size());
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error getting all theses", e);
         }
-        return studentList;
+        return theses;
     }       
 
     public Thesis getThesisByStudent(String mssv) {

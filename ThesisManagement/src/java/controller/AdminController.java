@@ -9,6 +9,7 @@ import dao.TopicRegistrationDAO;
 import dao.UserDAO;
 import dto.AddingUserRequest;
 import dto.AdminInformationRequest;
+import dto.AdminListThesis;
 import dto.StudentProgressDTO;
 import model.User;
 import jakarta.servlet.ServletException;
@@ -339,12 +340,12 @@ public class AdminController extends HttpServlet {
     private void showThesis(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
            
         String query = request.getParameter("query");
-        List<StudentProgressDTO> studentProgress;
+        List<AdminListThesis> studentProgress;
 
         if (query != null && !query.trim().isEmpty()) {
             studentProgress = thesisDAO.searchThesis(query.trim());
         } else {
-            studentProgress = thesisDAO.getAllStudentProgress();
+            studentProgress = thesisDAO.getThesisByAdmin();
         }        
         request.setAttribute("listThesis", studentProgress);
         request.getRequestDispatcher("/jsp/admin/thesis-list.jsp").forward(request, response);        

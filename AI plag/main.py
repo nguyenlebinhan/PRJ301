@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from bs4 import BeautifulSoup
 from docx import Document
 import fitz  
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 import os
 from dotenv import load_dotenv
 from openai import OpenAI
