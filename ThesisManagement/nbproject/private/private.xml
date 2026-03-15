@@ -8,7 +8,6 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/dashboard.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/thesis-history.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBContext.java</file>
-            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/AppointmentDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Student.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AdminController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/StudentDAO.java</file>
@@ -40,6 +39,7 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/ThesisDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/TopicResponseDTO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/config/AppListener.java</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/ThesisHistoryDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/StudentController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/AdminListThesis.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/filter/AuthFilter.java</file>

@@ -323,35 +323,24 @@ public class TopicDAO {
         }
         return list;
     }    
-    public boolean deleteTopic(int topicId, String mscv) {
-        String sql = "DELETE FROM Topics " +
-                     "WHERE topicId = ? AND createdBy = ?";
 
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+    public boolean deleteTopic(int topicId,int executedByUserId) {
+        String sql = "{call sp_DeleteTopic(?, ?)}";
 
-            ps.setInt(1, topicId);
-            ps.setString(2, mscv);
+            try (Connection conn = dbContext.getConnection();
+                 CallableStatement cstmt = conn.prepareCall(sql)) {
 
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Lỗi khi xóa tài ID: " + topicId, e);
-            return false;
-        }
-    }
-    public boolean deleteTopicByAdmin(int topicId) {
-        String sql = "DELETE FROM Topics " +
-                     "WHERE topicId = ?";
+                cstmt.setInt(1, topicId);
+                cstmt.setInt(2, executedByUserId);
 
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                cstmt.execute();
+                return true; // Nếu không có lỗi SQLException nghĩa là xóa thành công
 
-            ps.setInt(1, topicId);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Lỗi khi xóa tài ID: " + topicId, e);
-            return false;
-        }
+            } catch (SQLException e) {
+                // Procedure sẽ ném lỗi RAISERROR nếu giảng viên xóa nhầm topic người khác
+                LOGGER.log(Level.SEVERE, "Không thể xóa Topic ID: " + topicId + ". Lý do: " + e.getMessage());
+                return false;
+            }
     }    
     private Topic mapTopic(ResultSet rs) throws SQLException {
         Topic topic = new Topic();

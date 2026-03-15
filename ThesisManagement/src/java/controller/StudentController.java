@@ -6,7 +6,6 @@ package controller;
 
 import service.AIService;
 import com.google.gson.JsonObject;
-import dao.AppointmentDAO;
 import dao.LecturerDAO;
 import dao.StudentDAO;
 import dao.ThesisDAO;
@@ -36,7 +35,7 @@ import model.Topic;
 import model.TopicRegistration;
 import model.User;
 import java.util.logging.*;
-import model.Appointment;
+
 
 /**
  *
@@ -57,7 +56,6 @@ public class StudentController extends HttpServlet {
     private final TopicDAO topicDao = new TopicDAO();
     private final TopicRegistrationDAO topicRegistrationDao = new TopicRegistrationDAO();
     private final ThesisHistoryDAO thesisHistoryDAO = new ThesisHistoryDAO();
-    private final AppointmentDAO appointmentDAO = new AppointmentDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

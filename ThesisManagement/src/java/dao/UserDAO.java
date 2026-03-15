@@ -397,23 +397,17 @@ public class UserDAO {
     public boolean deleteUser(int userId){
         LOGGER.log(Level.INFO,"Delete user with user id: {0}",userId);
         
-        String sql = "DELETE FROM Users WHERE id = ?";
-        try (Connection conn = dbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+        String sql = "{call sp_DeleteUser(?)}";
+        try(Connection conn = dbContext.getConnection();
+            CallableStatement cstmt = conn.prepareCall(sql)){
+            cstmt.setInt(1, userId);
             
-            int rowsAffected = ps.executeUpdate();
-            if (rowsAffected > 0) {
-                LOGGER.log(Level.INFO, "Delete user successfully with user id: {0}", userId);
-                return true;
-            } else {
-                LOGGER.log(Level.WARNING, "Failed to delete user with user id: {0}", userId);
-                return false;
-            }
+            cstmt.execute();
+            return true;
         }catch(SQLException e){
-            LOGGER.log(Level.SEVERE,"Error deleting user with userId: " + userId,e);
+            LOGGER.log(Level.SEVERE,"Fail to delete user :" + userId, e);
             return false;
-        }        
+        }
     }
 
     private User mapUser(ResultSet rs) throws SQLException {

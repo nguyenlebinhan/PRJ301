@@ -76,7 +76,7 @@ public class DBInitializer {
                 + "createdBy VARCHAR(20), "
                 + "createdAt DATETIME DEFAULT GETDATE(), "
                 + "difficultyScore INT, "
-                + "FOREIGN KEY (createdBy) REFERENCES Lecturers(mscv)) ";
+                + "FOREIGN KEY (createdBy) REFERENCES Lecturers(mscv) ON DELETE CASCADE) ";
         execute(conn, sql, "Topics");
     }
 
@@ -99,9 +99,9 @@ public class DBInitializer {
                 + "relevantTopicScore FLOAT DEFAULT 0,"
                 + "relevantTopicStatus NVARCHAR(100), " 
                 + "relevance_analysis NVARCHAR(MAX),"
-                + "FOREIGN KEY (topicId) REFERENCES Topics(topicId), "
-                + "FOREIGN KEY (mssv) REFERENCES Students(mssv), "
-                + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv)) ";
+                + "FOREIGN KEY (topicId) REFERENCES Topics(topicId) ON DELETE CASCADE, "
+                + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE NO ACTION, "
+                + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv) ON DELETE NO ACTION) ";
         execute(conn, sql, "Theses");
     
 
@@ -117,9 +117,9 @@ public class DBInitializer {
                 + "mscvHD VARCHAR(20), "
                 + "registeredAt DATETIME DEFAULT GETDATE(), "
                 + "processedAt DATETIME, "
-                + "FOREIGN KEY (topicId) REFERENCES Topics(topicId), "
-                + "FOREIGN KEY (mssv) REFERENCES Students(mssv), "
-                + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv))";
+                + "FOREIGN KEY (topicId) REFERENCES Topics(topicId) ON DELETE CASCADE, "
+                + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE NO ACTION, "
+                + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv) ON DELETE NO ACTION)";
         execute(conn, sql, "TopicRegistrations");
     }
     
@@ -138,8 +138,8 @@ public class DBInitializer {
                 + "relevantTopicScore FLOAT DEFAULT 0,"
                 + "relevantTopicStatus NVARCHAR(100), " 
                 + "relevance_analysis NVARCHAR(MAX),"
-                + "FOREIGN KEY (mssv) REFERENCES Students(mssv), "                
-                + "FOREIGN KEY (thesisId) REFERENCES Theses(thesisId)) ";
+                + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE CASCADE, "                
+                + "FOREIGN KEY (thesisId) REFERENCES Theses(thesisId) ON DELETE NO ACTION) ";
         execute (conn,sql,"ThesisHistory");
     }
 

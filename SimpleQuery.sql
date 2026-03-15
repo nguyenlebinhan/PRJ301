@@ -74,6 +74,99 @@ BEGIN
 END;
 GO
 
+CREATE PROCEDURE sp_DeleteUser (@UserId INT)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION
+    BEGIN TRY
+        
+        DECLARE @Mssv VARCHAR(20) = (SELECT mssv FROM Students WHERE userId = @UserId);
+        DECLARE @Mscv VARCHAR(20) = (SELECT mscv FROM Lecturers WHERE userId = @UserId);
+
+       
+        IF @Mssv IS NOT NULL
+        BEGIN
+            DELETE FROM ThesisHistory WHERE mssv = @Mssv;
+            DELETE FROM TopicRegistrations WHERE mssv = @Mssv;
+            DELETE FROM Theses WHERE mssv = @Mssv;
+            DELETE FROM Students WHERE userId = @UserId;
+        END
+
+        
+        IF @Mscv IS NOT NULL
+        BEGIN
+           
+            DELETE FROM ThesisHistory WHERE thesisId IN (SELECT thesisId FROM Theses WHERE mscvHD = @Mscv);
+            
+           
+            DELETE FROM TopicRegistrations WHERE topicId IN (SELECT topicId FROM Topics WHERE createdBy = @Mscv);
+            
+           
+            DELETE FROM Theses WHERE mscvHD = @Mscv;
+            
+            
+            DELETE FROM Topics WHERE createdBy = @Mscv;
+            
+            DELETE FROM Lecturers WHERE userId = @UserId;
+        END
+
+        
+        DELETE FROM ResetTokens WHERE userId = @UserId;
+
+        
+        DELETE FROM Users WHERE id = @UserId;
+
+        COMMIT TRANSACTION
+        PRINT 'Đã xóa sạch toàn bộ dữ liệu liên quan đến User ID: ' + CAST(@UserId AS VARCHAR);
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        DECLARE @Err NVARCHAR(MAX) = ERROR_MESSAGE();
+        RAISERROR(@Err, 16, 1);
+    END CATCH
+END
+
+CREATE PROCEDURE sp_DeleteTopic (@TopicId INT, @ExecutedByUserId INT)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION
+    BEGIN TRY
+        
+        DECLARE @UserRole NVARCHAR(100) = (SELECT role FROM Users WHERE id = @ExecutedByUserId);
+        DECLARE @LecturerMscv VARCHAR(20) = (SELECT mscv FROM Lecturers WHERE userId = @ExecutedByUserId);
+        DECLARE @OwnerMscv VARCHAR(20) = (SELECT createdBy FROM Topics WHERE topicId = @TopicId);
+
+        
+        IF @UserRole <> 'ADMIN' AND (@LecturerMscv IS NULL OR @LecturerMscv <> @OwnerMscv)
+        BEGIN
+            RAISERROR('Bạn không có quyền xóa đề tài này!', 16, 1);
+            RETURN;
+        END
+
+       
+        DELETE FROM ThesisHistory WHERE thesisId IN (SELECT thesisId FROM Theses WHERE topicId = @TopicId);
+
+        
+        DELETE FROM Theses WHERE topicId = @TopicId;
+
+        
+        DELETE FROM TopicRegistrations WHERE topicId = @TopicId;
+
+        
+        DELETE FROM Topics WHERE topicId = @TopicId;
+
+        COMMIT TRANSACTION
+        PRINT 'Đã xóa sạch đề tài và các dữ liệu liên quan.';
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        DECLARE @ErrMsg NVARCHAR(MAX) = ERROR_MESSAGE();
+        RAISERROR(@ErrMsg, 16, 1);
+    END CATCH
+END
+
 SELECT th.* FROM ThesisHistory th INNER JOIN Theses t on t.thesisId = th.thesisId INNER JOIN Topics topics on topics.topicId = t.topicId WHERE th.mssv = 'SV001' AND th.thesisId = '1'  ORDER BY createdAt DESC
 select Count(thesisId) as numberOfReport from Theses where mscvHD = ;
 select * from Appointment;

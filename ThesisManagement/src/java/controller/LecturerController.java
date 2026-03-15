@@ -27,7 +27,6 @@ public class LecturerController extends HttpServlet {
     private final StudentDAO studentDao = new StudentDAO();
     private final ThesisHistoryDAO thesisHistoryDAO = new ThesisHistoryDAO();
     private final EmailService emailService = new EmailService();
-    private final AppointmentDAO appointmentDAO = new AppointmentDAO();
     private final UserDAO userDAO = new UserDAO();
     
     @Override
@@ -67,9 +66,6 @@ public class LecturerController extends HttpServlet {
                     break;
                 case "/thesis/history":
                     showStudentThesisHistory(request,response);
-                    break;
-                case "/appointment":
-                    showAppointment(request,response,user);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -454,10 +450,8 @@ public class LecturerController extends HttpServlet {
             HttpSession session = request.getSession(false);
             User user = (User) session.getAttribute("user");
 
-            // Lấy thông tin giảng viên để đảm bảo họ chỉ ẩn được đề tài của chính mình
-            Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
 
-            if (topicDAO.deleteTopic(topicId, lecturer.getMscv())) {
+            if (topicDAO.deleteTopic(topicId, user.getId())) {
                 response.sendRedirect(request.getContextPath() + "/lecturer/topics?msg=delete_success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/lecturer/topics?error=delete_failed");
@@ -467,11 +461,5 @@ public class LecturerController extends HttpServlet {
         }
     } 
 
-    private void showAppointment(HttpServletRequest request, HttpServletResponse response,User user) throws ServletException, IOException {
-        Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
-        List<AppointmentResponse> appointments = appointmentDAO.getAppointmentByMscv(lecturer.getMscv());
-        request.setAttribute("pendingAppointments", appointments);
-        request.getRequestDispatcher("/jsp/lecturer/appointment.jsp").forward(request, response);
-    }
 
 }

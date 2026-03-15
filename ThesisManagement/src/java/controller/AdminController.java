@@ -303,7 +303,7 @@ public class AdminController extends HttpServlet {
             User user = (User) session.getAttribute("user");
 
 
-            if (topicDAO.deleteTopicByAdmin(topicId)) {
+            if (topicDAO.deleteTopic(topicId,user.getId())) {
                 response.sendRedirect(request.getContextPath() + "/admin/topic?msg=delete_success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/admin/topic?error=delete_failed");
