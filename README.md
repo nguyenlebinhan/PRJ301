@@ -32,7 +32,7 @@ The system supports the full thesis lifecycle:
 
 - **Xác thực & phân quyền / Authentication & Authorization**: Đăng nhập, đăng xuất, phân quyền theo vai trò thông qua `AuthController` và `AuthFilter`.
 - **Quản lý sinh viên / Student Management**: Chức năng cho sinh viên đăng ký đề tài, xem trạng thái, lịch sử khóa luận (`StudentController`, JSP trong `web/jsp/student`).
-- **Quản lý giảng viên / Lecturer Management**: Giảng viên xem danh sách sinh viên hướng dẫn, duyệt đề tài, quản lý lịch hẹn (`LecturerController`, JSP trong `web/jsp/lecturer`).
+- **Quản lý giảng viên / Lecturer Management**: Giảng viên xem danh sách sinh viên hướng dẫn, duyệt đề tài(`LecturerController`, JSP trong `web/jsp/lecturer`).
 - **Quản trị hệ thống / Administration**: Admin quản lý tài khoản, đề tài, cấu hình chung (`AdminController`, JSP trong `web/jsp/admin`).
 - **Giao diện động / Dynamic UI**: Xây dựng bằng JSP, JSTL và HTML/CSS/JS.
 
@@ -206,7 +206,6 @@ You can use either approach:
 - **Giảng viên** (`/lecturer/*`):
   - Xem danh sách sinh viên hướng dẫn.
   - Duyệt/ từ chối đề tài, cập nhật trạng thái.
-  - Quản lý lịch hẹn, nhận xét.
 - **Admin** (`/admin/*`):
   - Quản lý tài khoản sinh viên/giảng viên.
   - Quản lý danh sách đề tài, cấu hình hệ thống.
