@@ -4,8 +4,6 @@ from unittest import result
 import numpy as np
 from fastapi import APIRouter
 from ddgs import DDGS
-
-# Import từ các module bạn đã chia
 from app.models.schemas import ThesisRequest, TopicRelevanceRequest, ImprovementRequest
 from app.utils import scraper, text_process
 from app.services import ai_service
