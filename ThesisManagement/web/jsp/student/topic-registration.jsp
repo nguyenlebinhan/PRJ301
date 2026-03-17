@@ -11,7 +11,7 @@
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <%-- Hiển thị lỗi từ Session (Ví dụ: Lỗi đăng ký trùng lặp) --%>
+        
         <c:if test="${not empty sessionScope.error}">
             <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                 <div class="d-flex align-items-center">
@@ -22,11 +22,11 @@
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <%-- Xóa lỗi ngay sau khi hiển thị để không hiện lại khi F5 --%>
+            
             <c:remove var="error" scope="session" />
         </c:if>
 
-        <%-- Phần tiêu đề và bảng danh sách đề tài của bạn bên dưới... --%>
+        
     </div>
     <div class="container mt-5">
         <div class="row justify-content-center">

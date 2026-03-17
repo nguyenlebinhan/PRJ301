@@ -24,6 +24,10 @@ public class ThesisHistoryResponse {
     private double relevantTopicScore;
     private String relevantTopicStatus;
     private String relevanceAnalysis;
+    private String focusAnalysis;
+    private String generalObservations;
+    private String topPrior;
+    private String aiRequestPrompt;
     private String title;
     private String topicCode;
 
@@ -50,7 +54,7 @@ public class ThesisHistoryResponse {
         this.createdAt = createdAt;
     }
 
-    public ThesisHistoryResponse(int historyId, int thesisId, String mssv, String reportFile, String sourceCodeLink, LocalDateTime createdAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis, String title, String topicCode) {
+    public ThesisHistoryResponse(int historyId, int thesisId, String mssv, String reportFile, String sourceCodeLink, LocalDateTime createdAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis, String focusAnalysis, String generalObservations, String topPrior, String aiRequestPrompt, String title, String topicCode) {
         this.historyId = historyId;
         this.thesisId = thesisId;
         this.mssv = mssv;
@@ -64,14 +68,46 @@ public class ThesisHistoryResponse {
         this.relevantTopicScore = relevantTopicScore;
         this.relevantTopicStatus = relevantTopicStatus;
         this.relevanceAnalysis = relevanceAnalysis;
+        this.focusAnalysis = focusAnalysis;
+        this.generalObservations = generalObservations;
+        this.topPrior = topPrior;
+        this.aiRequestPrompt = aiRequestPrompt;
         this.title = title;
         this.topicCode = topicCode;
     }
 
+    public String getAiRequestPrompt() {
+        return aiRequestPrompt;
+    }
 
+    public void setAiRequestPrompt(String aiRequestPrompt) {
+        this.aiRequestPrompt = aiRequestPrompt;
+    }
 
-    
-    
+    public String getFocusAnalysis() {
+        return focusAnalysis;
+    }
+
+    public void setFocusAnalysis(String focusAnalysis) {
+        this.focusAnalysis = focusAnalysis;
+    }
+
+    public String getGeneralObservations() {
+        return generalObservations;
+    }
+
+    public void setGeneralObservations(String generalObservations) {
+        this.generalObservations = generalObservations;
+    }
+
+    public String getTopPrior() {
+        return topPrior;
+    }
+
+    public void setTopPrior(String topPrior) {
+        this.topPrior = topPrior;
+    }
+
     
 
     public ThesisHistoryResponse(String title, String topicCode) {

@@ -3,10 +3,6 @@ package dal;
 import java.sql.*;
 import java.util.logging.*;
 
-/**
- * Database Initializer cho hệ thống Quản lý Đồ án Tốt nghiệp
- * Tạo tất cả các bảng cần thiết và dữ liệu mẫu
- */
 public class DBInitializer {
     private static final Logger LOGGER = Logger.getLogger(DBInitializer.class.getName());
     private final DBContext dbContext;
@@ -14,11 +10,8 @@ public class DBInitializer {
     public DBInitializer() {
         this.dbContext = new DBContext();
     }
-
-    // ========== CREATE TABLES ==========
     
-
-
+    
     private void createUsersTable(Connection conn) throws SQLException {
         String sql = "CREATE TABLE Users ("
                 + "id INT PRIMARY KEY IDENTITY(1,1), "
@@ -87,7 +80,6 @@ public class DBInitializer {
                 + "topicId INT NOT NULL, "
                 + "mssv VARCHAR(20) NOT NULL, "
                 + "mscvHD VARCHAR(20) NOT NULL, "
-                // reportFile sẽ lưu URL nội bộ dẫn đến file PDF trong thư mục uploads
                 + "reportFile NVARCHAR(500), " 
                 + "sourceCodeLink NVARCHAR(500), "
                 + "status VARCHAR(20) DEFAULT 'IN_PROGRESS', "
@@ -99,6 +91,10 @@ public class DBInitializer {
                 + "relevantTopicScore FLOAT DEFAULT 0,"
                 + "relevantTopicStatus NVARCHAR(100), " 
                 + "relevance_analysis NVARCHAR(MAX),"
+                + "focus_analysis NVARCHAR(MAX),"
+                + "general_observations NVARCHAR(MAX),"
+                + "top_three_prior NVARCHAR(MAX),"
+                + "aiRequestPrompt NVARCHAR(MAX)"
                 + "FOREIGN KEY (topicId) REFERENCES Topics(topicId) ON DELETE CASCADE, "
                 + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE NO ACTION, "
                 + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv) ON DELETE NO ACTION) ";
@@ -138,6 +134,10 @@ public class DBInitializer {
                 + "relevantTopicScore FLOAT DEFAULT 0,"
                 + "relevantTopicStatus NVARCHAR(100), " 
                 + "relevance_analysis NVARCHAR(MAX),"
+                + "focus_analysis NVARCHAR(MAX),"
+                + "general_observations NVARCHAR(MAX),"
+                + "top_three_prior NVARCHAR(MAX),"     
+                + "aiRequestPrompt NVARCHAR(MAX)"                
                 + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE CASCADE, "                
                 + "FOREIGN KEY (thesisId) REFERENCES Theses(thesisId) ON DELETE NO ACTION) ";
         execute (conn,sql,"ThesisHistory");
@@ -166,21 +166,20 @@ public class DBInitializer {
             }
 
             String[] dropOrder = {
-                "ThesisHistory",     // Tham chiếu Theses                
-                "TopicRegistrations",// Tham chiếu Topics, Students, Lecturers
-                "ResetTokens",       // Tham chiếu Users
-                "Theses",            // Tham chiếu Topics, Students, Lecturers
-                "Topics",            // Tham chiếu Lecturers
-                "Students",          // Tham chiếu Users
-                "Lecturers",         // Tham chiếu Users
-                "Users",             // Tham chiếu Roles
+                "ThesisHistory",                    
+                "TopicRegistrations",
+                "ResetTokens",       
+                "Theses",            
+                "Topics",            
+                "Students",          
+                "Lecturers",         
+                "Users",            
                 
             };
-            // Thứ tự CREATE (Từ bảng cha đến bảng phụ thuộc)
             String[] createOrder = {
                  "Users", "Students", "Lecturers", "Topics", 
                 "Theses","ThesisHistory", 
-                "TopicRegistrations", "ResetTokens"
+                "TopicRegistrations", "ResetTokens",
             };
 
             if (enforceReset) {

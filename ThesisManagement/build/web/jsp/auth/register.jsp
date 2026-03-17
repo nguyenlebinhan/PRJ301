@@ -192,7 +192,7 @@
                     </div>
                 </div>
                 
-                <!-- Lecturer specific fields -->
+               
                 <div id="lecturerFields" class="role-specific">
                     <h3>Thông tin giảng viên</h3>
                     <div class="form-group">

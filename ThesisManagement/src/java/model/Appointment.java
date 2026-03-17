@@ -12,49 +12,31 @@ import java.sql.*;
  */
 public class Appointment {
     private int appointmentId;
+    private Date appointmentDate;
+    private String location;    
+    private Timestamp meetingDate;
+    private String description;
+    private String status;    
     private String mssv;
     private String mscv;
     private int thesisId;
-    private String purpose;
-    private Timestamp meetingDate;
-    private String location;
-    private String status;
-    private Date createdAt;
+    private Timestamp createdAt;
 
     public Appointment() {
     }
 
-    public Appointment(int appointmentId, String mssv, String mscv, int thesisId, String purpose, Timestamp meetingDate, String location, String status, Date createdAt) {
+    public Appointment(int appointmentId, Date appointmentDate, String location, Timestamp meetingDate, String description, String status, String mssv, String mscv, int thesisId, Timestamp createdAt) {
         this.appointmentId = appointmentId;
+        this.appointmentDate = appointmentDate;
+        this.location = location;
+        this.meetingDate = meetingDate;
+        this.description = description;
+        this.status = status;
         this.mssv = mssv;
         this.mscv = mscv;
         this.thesisId = thesisId;
-        this.purpose = purpose;
-        this.meetingDate = meetingDate;
-        this.location = location;
-        this.status = status;
         this.createdAt = createdAt;
     }
-
-    public Appointment(String mssv, String mscv, String purpose, Timestamp meetingDate, String location, String status) {
-        this.mssv = mssv;
-        this.mscv = mscv;
-        this.purpose = purpose;
-        this.meetingDate = meetingDate;
-        this.location = location;
-        this.status = status;
-    }
-
-    public Appointment(String mssv, String mscv, int thesisId, String purpose, Timestamp meetingDate, String location) {
-        this.mssv = mssv;
-        this.mscv = mscv;
-        this.thesisId = thesisId;
-        this.purpose = purpose;
-        this.meetingDate = meetingDate;
-        this.location = location;
-    }
-    
-    
 
     public int getAppointmentId() {
         return appointmentId;
@@ -80,20 +62,36 @@ public class Appointment {
         this.mscv = mscv;
     }
 
+    public Date getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public void setAppointmentDate(Date appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public int getThesisId() {
         return thesisId;
     }
 
     public void setThesisId(int thesisId) {
         this.thesisId = thesisId;
-    }
-
-    public String getPurpose() {
-        return purpose;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
     }
 
     public Timestamp getMeetingDate() {
@@ -103,9 +101,6 @@ public class Appointment {
     public void setMeetingDate(Timestamp meetingDate) {
         this.meetingDate = meetingDate;
     }
-    
-    
-
 
     public String getLocation() {
         return location;
@@ -123,14 +118,4 @@ public class Appointment {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    
-    
 }

@@ -1,0 +1,16 @@
+# Ignore files không cần thiết khi deploy
+nbproject/
+build/
+test/
+*.iml
+*.log
+.env
+.env.local
+.git/
+.gitignore
+README.md
+DEPLOYMENT_GUIDE.md
+deploy.sh
+deploy.bat
+.ebignore
+

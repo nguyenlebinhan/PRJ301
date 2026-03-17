@@ -3,6 +3,7 @@ package dao;
 import dal.DBContext;
 import dto.AdminInformationRequest;
 import dto.AdminListThesis;
+import dto.ImprovementRequest;
 import dto.StudentProgressDTO;
 import dto.ThesisUpdateRequest;
 import dto.TopicThesisDTO;
@@ -313,6 +314,26 @@ public class ThesisDAO {
             return false;
         }
     }
+    public boolean updateAnalysis(ImprovementRequest request) {
+        String sql = "UPDATE Theses SET focus_analysis= ?, general_observations = ?, top_three_prior = ?, aiRequestPrompt = ? "
+                + "WHERE thesisId = ?";
+        
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setNString(1, request.getFocusAnalysis());
+            ps.setNString(2,request.getGeneralObservations());
+            ps.setNString(3, request.getTopPrior());
+            ps.setNString(4, request.getAiRequestPrompt());
+            ps.setInt(5, request.getThesisId());
+
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating thesis", e);
+            return false;
+        }
+    }    
 
     private Thesis mapThesis(ResultSet rs) throws SQLException {
         Thesis thesis = new Thesis();

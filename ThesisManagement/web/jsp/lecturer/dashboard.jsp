@@ -33,12 +33,10 @@
             </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <%-- Xóa lỗi khỏi session ngay sau khi hiển thị để không hiện lại khi F5 --%>
         <c:remove var="error" scope="session" />
     </c:if>    
     <div class="mt-3">
         <c:choose>
-            <%-- Trường hợp: Đã duyệt thành công --%>
             <c:when test="${param.msg == 'approved'}">
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
                     <i class="fas fa-check-circle me-2"></i>
@@ -47,7 +45,7 @@
                 </div>
             </c:when>
 
-            <%-- Trường hợp: Đạt giới hạn 5 sinh viên --%>
+            
             <c:when test="${param.msg == 'limit_reached'}">
                 <div class="alert alert-warning alert-dismissible fade show border-0 shadow-sm" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i>
@@ -56,7 +54,7 @@
                 </div>
             </c:when>
 
-            <%-- Trường hợp: Lỗi logic hoặc lỗi hệ thống --%>
+            
             <c:when test="${param.msg == 'error' || param.msg == 'system_error'}">
                 <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
                     <i class="fas fa-times-circle me-2"></i>

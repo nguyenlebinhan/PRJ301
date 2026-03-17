@@ -43,15 +43,11 @@ public class EmailService {
         });
 
         try {
-            // 3. Create Message
+            
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(FROM_EMAIL));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
             message.setSubject(subject, "UTF-8");
-            
-            // Support HTML content
-            message.setSubject(subject, "UTF-8"); 
-            message.setHeader("Content-Type", "text/html; charset=UTF-8");
             message.setContent(body, "text/html; charset=utf-8");            
 
             // 4. Send Email
@@ -94,6 +90,16 @@ public class EmailService {
                           "<p>If you did not request this, please ignore this email.</p>" +
                           "</body></html>";
             
+            sendEmail(toEmail, subject, body);
+        });
+    }
+    
+    public void sendEmailToStudent(String toEmail,String message){
+        EMAIL_EXECUTOR.submit(() ->{
+            String subject = "Message From Lecturer";
+            String body = "<html><head><meta charset='UTF-8'></head><body>" 
+                           +message+
+                          "</body></html>";
             sendEmail(toEmail, subject, body);
         });
     }

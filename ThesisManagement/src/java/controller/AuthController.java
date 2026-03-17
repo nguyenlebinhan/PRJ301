@@ -61,8 +61,8 @@ public class AuthController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8"); // Đảm bảo nhận tiếng Việt
-        response.setCharacterEncoding("UTF-8"); // Đảm bảo gửi tiếng Việt
+        request.setCharacterEncoding("UTF-8"); 
+        response.setCharacterEncoding("UTF-8"); 
         response.setContentType("text/html; charset=UTF-8");
         String action = request.getPathInfo();
         LOGGER.log(Level.INFO, "Action received in AuthController (POST): {0}", action);        
@@ -487,7 +487,6 @@ public class AuthController extends HttpServlet {
             LOGGER.log(Level.INFO, "Login successful - username: {0}, userId: {1}, role: {2}", 
                     new Object[]{username, user.getId(), user.getRole()});
             
-            // Redirect to appropriate dashboard
             String role = user.getRole();
             String redirectUrl = getDashboardUrl(role, request);
             LOGGER.log(Level.INFO, "Redirecting to: {0}", redirectUrl);

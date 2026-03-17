@@ -136,7 +136,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="message-text" class="form-label text-muted small fw-bold">Nội dung thông báo:</label>
+                                <label for="message-text" class="form-label text-muted small fw-bold">Nội dung thông báo(Khuyến khích bằng tiếng anh):</label>
                                 <textarea class="form-control" name ="message-email" id="message-text" rows="4" placeholder="Nhập nội dung gửi đến sinh viên..." required></textarea>
                             </div>
                         </form>
@@ -154,16 +154,13 @@
 </div>
 <script>
     function prepareEmailModal(mssv, name, email) {
-        // 1. Hiển thị lên giao diện (thẻ span/strong)
         document.getElementById('emailStudentNameDisplay').innerText = name;
         document.getElementById('emailMssvText').innerText = mssv;
         document.getElementById('emailDisplay').innerText = email;
         
-        // 2. Gán vào các input ẩn để khi submit form sẽ gửi lên Server
         document.getElementById('recipient-mssv').value = mssv;
         document.getElementById('recipient-email').value = email;
         
-        // 3. Reset nội dung tin nhắn
         document.getElementById('message-text').value = '';
     }
 

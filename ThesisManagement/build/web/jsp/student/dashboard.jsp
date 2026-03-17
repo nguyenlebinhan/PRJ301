@@ -10,12 +10,16 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <fmt:formatDate value="${now}" pattern="yyyy-MM-dd" var="today" />
     <style>
         :root { --ai-purple: #6f42c1; }
         .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .progress { height: 8px; border-radius: 10px; }
         .bg-info-soft { background-color: #e0f7fa; color: #00acc1; }
         .status-badge { font-size: 0.9rem; padding: 0.5em 1em; }
+        .ai-option { transition: all 0.3s ease; cursor: pointer; border: 2px solid transparent; }
+        .ai-option:hover { transform: translateY(-5px); border-color: #0d6efd; }
+        .ai-option.active { border-color: #0d6efd; background-color: #f0f7ff; }       
     </style>
 </head>
 <body class="bg-light">
@@ -99,7 +103,7 @@
         </div>
 
         <c:choose>
-            <%-- TRƯỜNG HỢP 1: CÓ ĐỀ TÀI ĐÃ ĐƯỢC DUYỆT (ACCEPTED) --%>
+            
             <c:when test="${not empty acceptedTopics}">
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
@@ -134,12 +138,17 @@
                                                             <a href="${pageContext.request.contextPath}/student/thesis/history?thesisId=${acceptedTopics.thesisId}&mssv=${acceptedTopics.mssv}" 
                                                                class="btn btn-sm btn-outline-info shadow-sm">
                                                                 <i class="fas fa-history"></i> Xem lịch sử chi tiết
-                                                            </a>                                                  
+                                                            </a>                                                                                                       
                                                             <button class="btn btn-sm btn-outline-warning" 
                                                                     data-bs-toggle="modal" 
                                                                     data-bs-target="#editThesisModal${acceptedTopics.thesisId}">
                                                                 <i class="fas fa-edit"></i> Sửa
                                                             </button>
+                                                            <button class="btn btn-sm btn-outline-primary" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#aiSuggestionModal${acceptedTopics.thesisId}">
+                                                                <i class="fas fa-robot"></i> Gợi ý AI
+                                                            </button>                                                                 
                                                         </div>
                                                     </c:otherwise>
                                                 </c:choose>
@@ -186,7 +195,56 @@
                                                    </form>
                                                </div>
                                            </div>
-                                       </div>
+                                        </div>
+                                        <div class="modal fade" id="aiSuggestionModal${acceptedTopics.thesisId}" tabindex="-1" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content border-0 shadow-lg">
+                                                    <form action="${pageContext.request.contextPath}/student/thesis/ai-advice" method="POST" id="aiRequestForm${acceptedTopics.thesisId}">
+                                                        <div class="modal-header bg-dark text-white">
+                                                            <h5 class="modal-title"><i class="fas fa-robot me-2 text-warning"></i>Yêu cầu AI Phân tích</h5>
+                                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <input type="hidden" name="thesisId" value="${acceptedTopics.thesisId}">
+                                                            <input type="hidden" name="reportFile" value="${acceptedTopics.reportFile}">
+                                                            <div class="mb-3">
+                                                                <label class="form-label fw-bold">
+                                                                    <i class="fas fa-comment-dots me-2 text-primary"></i>
+                                                                    Mô tả hướng suy luận bạn muốn AI tập trung:
+                                                                </label>
+                                                                <textarea class="form-control border-primary shadow-sm" 
+                                                                          name="userPrompt" 
+                                                                          rows="5" 
+                                                                          placeholder="Ví dụ: Kiểm tra tính logic giữa chương 1 và chương 2; hoặc: Soát lỗi chính tả và văn phong khoa học cho mục 3.2..." 
+                                                                          required></textarea>
+                                                                <div class="form-text mt-2">
+                                                                    <i class="fas fa-info-circle me-1"></i>
+                                                                    Mô tả càng chi tiết, AI sẽ phản hồi càng chính xác cho bản báo cáo của bạn.
+                                                                </div>
+                                                            </div>
+
+                                                            <div id="aiResponseArea${acceptedTopics.thesisId}" class="d-none mt-4">
+                                                                <hr>
+                                                                <h6 class="fw-bold text-success"><i class="fas fa-magic me-2"></i>Phản hồi từ AI:</h6>
+                                                                <div class="bg-light p-3 rounded border border-success shadow-inner" 
+                                                                     id="aiContent${acceptedTopics.thesisId}" 
+                                                                     style="white-space: pre-line; max-height: 300px; overflow-y: auto;">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer bg-light">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                                            <button type="submit" class="btn btn-primary px-4" id="btnSubmitAI${acceptedTopics.thesisId}">
+                                                                <i class="fas fa-paper-plane me-1"></i> Gửi yêu cầu
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+
 
                                         <c:if test="${not empty acceptedTopics.thesisId && acceptedTopics.thesisId != 0}">
                                             <div class="modal fade" id="editThesisModal${acceptedTopics.thesisId}" tabindex="-1" aria-hidden="true">
@@ -216,10 +274,8 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div>                                                                                   
                                         </c:if>
-
-                                    
                                 </tbody>
                             </table>
                         </div>
@@ -227,7 +283,7 @@
                 </div>
             </c:when>
 
-            <%-- TRƯỜNG HỢP 2: CHƯA CÓ ĐỀ TÀI NÀO ĐƯỢC DUYỆT --%>
+            
             <c:otherwise>
                 <div class="card p-5 text-center shadow-sm border-0">
                     <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" style="width: 100px;" class="mx-auto mb-4 opacity-50">
@@ -240,94 +296,41 @@
             </c:otherwise>
         </c:choose>
 
-    </div>
-    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow-lg">
-            <form action="${pageContext.request.contextPath}/student/appointment/create" method="POST">
-                
-                <div class="modal-header bg-dark text-white p-4 border-0 rounded-top-4">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-25 p-2 rounded-3 me-3 text-primary">
-                            <i class="fas fa-clock fa-lg"></i>
-                        </div>
-                        <div>
-                            <h5 class="modal-title fw-bold mb-0">Cấu hình lịch hẹn</h5>
-                            <small class="text-secondary">Chọn thời gian cụ thể bạn muốn gặp</small>
-                        </div>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body p-4 bg-light bg-opacity-50">
-                    <div class="row g-4">
-                        <div class="col-sm-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">1. Chọn Ngày</label>
-                            <div class="input-group shadow-sm border rounded-3 overflow-hidden bg-white">
-                                <span class="input-group-text bg-transparent border-0"><i class="fas fa-calendar-day text-primary"></i></span>
-                                <input type="date" name="appointmentDate" class="form-control border-0 p-2" required 
-                                       min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">3. Địa điểm / Hình thức họp</label>
-                            <div class="input-group shadow-sm border rounded-3 overflow-hidden bg-white">
-                                <span class="input-group-text bg-transparent border-0"><i class="fas fa-map-marker-alt text-primary"></i></span>
-                                <input type="text" name="location" class="form-control border-0 p-2" 
-                                       placeholder="Ví dụ: Phòng bộ môn, Google Meet, Zoom..." required>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">2. Chọn Giờ</label>
-                            <div class="input-group shadow-sm border rounded-3 overflow-hidden bg-white">
-                                <span class="input-group-text bg-transparent border-0"><i class="fas fa-user-clock text-primary"></i></span>
-                                <input type="time" name="appointmentTime" class="form-control border-0 p-2" 
-                                       required list="popularHours">
-                                <datalist id="popularHours">
-                                    <option value="08:00">
-                                    <option value="09:30">
-                                    <option value="13:30">
-                                    <option value="15:00">
-                                </datalist>
-                            </div>
-                        </div>
-
-                        <div class="col-12 mt-2">
-                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">3. Nội dung thảo luận</label>
-                            <div class="shadow-sm border rounded-3 overflow-hidden bg-white">
-                                <textarea name="purpose" class="form-control border-0 p-3" rows="3" 
-                                          placeholder="Bạn muốn giảng viên tập trung vào phần nào trong buổi hẹn này?" required></textarea>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 p-3 bg-white border-start border-4 border-warning rounded-3 shadow-sm d-flex align-items-center">
-                        <i class="fas fa-exclamation-circle text-warning me-3 fs-5"></i>
-                        <div class="small text-muted">Lưu ý: Giờ hẹn nên nằm trong <strong>giờ hành chính</strong> để giảng viên dễ dàng phê duyệt.</div>
-                    </div>
-                </div>
-
-                <div class="modal-footer border-0 p-4 bg-light rounded-bottom-4">
-                    <button type="button" class="btn btn-outline-secondary border-0 fw-bold me-auto" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm">
-                        Gửi yêu cầu <i class="fas fa-paper-plane ms-2"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>             
-    <script>
-        document.getElementById('uploadForm').onsubmit = function() {
-            // Đóng Modal hiện tại để tránh bấm nhầm lần 2
-            var myModalEl = document.querySelector('.modal.show');
-            var modal = bootstrap.Modal.getInstance(myModalEl);
-            if (modal) modal.hide();
+    </div>      
+</div>  
+                            
+<script>
+    document.getElementById('uploadForm').onsubmit = function() {
+        
+        var myModalEl = document.querySelector('.modal.show');
+        var modal = bootstrap.Modal.getInstance(myModalEl);
+        if (modal) modal.hide();
 
 
+        Swal.fire({
+            title: 'Đang phân tích AI...',
+            html: 'Hệ thống đang quét <b>các nguồn dữ liệu</b> trên Internet.<br/>Vui lòng chờ trong giây lát (có thể mất 30-45 giây).',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    };
+    
+    document.querySelectorAll('[id^="aiRequestForm"]').forEach(form => {
+        form.onsubmit = function() {
+            
+            const openModal = document.querySelector('.modal.show');
+            if (openModal) {
+                const modalInstance = bootstrap.Modal.getInstance(openModal);
+                if (modalInstance) modalInstance.hide();
+            }
+
+            
             Swal.fire({
-                title: 'Đang phân tích AI...',
-                html: 'Hệ thống đang quét <b>hàng triệu nguồn dữ liệu</b> trên Internet.<br/>Vui lòng chờ trong giây lát (có thể mất 30-45 giây).',
+                title: 'AI đang phân tích...',
+                html: 'Hệ thống đang đọc nội dung và xử lý yêu cầu của bạn.<br/>Vui lòng đợi trong giây lát (có thể mất 30-45 giây).',
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 didOpen: () => {
@@ -335,34 +338,46 @@
                 }
             });
         };
-    </script>
+    });  
 
-    <script>
-        // Bắt tất cả các form có class là 'plagiarism-form'
-        document.querySelectorAll('.plagiarism-form').forEach(form => {
-            form.onsubmit = function() {
-                // 1. Tìm modal đang mở và đóng nó lại
-                const openModal = document.querySelector('.modal.show');
-                if (openModal) {
-                    const modalInstance = bootstrap.Modal.getInstance(openModal);
-                    if (modalInstance) modalInstance.hide();
+    
+    document.querySelectorAll('.plagiarism-form').forEach(form => {
+        form.onsubmit = function() {
+            
+            const openModal = document.querySelector('.modal.show');
+            if (openModal) {
+                const modalInstance = bootstrap.Modal.getInstance(openModal);
+                if (modalInstance) modalInstance.hide();
+            }
+
+           
+            Swal.fire({
+                title: 'Đang cập nhật & Quét AI...',
+                html: 'Hệ thống đang phân tích bản báo cáo mới của bạn.<br/>' + 
+                     'Quá trình <b>so khớp ngữ nghĩa</b> đang diễn ra...',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                timerProgressBar: true,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
+            });
+        };
+    });
+    
+    let selectedMode = 'cautruc'; 
 
-                // 2. Hiển thị thông báo AI đang làm việc
-                Swal.fire({
-                    title: 'Đang cập nhật & Quét AI...',
-                    html: 'Hệ thống đang phân tích bản báo cáo mới của bạn.<br/>' + 
-                         'Quá trình <b>so khớp ngữ nghĩa</b> đang diễn ra...',
-                    allowOutsideClick: false,
-                    showConfirmButton: false,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                        Swal.showLoading();
-                    }
-                });
-            };
+    function selectReasoning(element, mode) {
+        document.querySelectorAll('.ai-option').forEach(el => {
+            el.classList.remove('active', 'border-primary');
+            el.classList.add('border-light');
         });
-    </script>
+        element.classList.add('active', 'border-primary');
+        element.classList.remove('border-light');
+        selectedMode = mode;
+    }
+
+</script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 

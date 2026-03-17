@@ -49,7 +49,8 @@
                         <th>Trạng thái đạo văn</th>
                         <th>Điểm tương quan giữa đề tài với bài luận án</th>
                         <th>Tình trạng lạc đề</th>
-                        <th>Chi tiết AI</th>
+                        <th>AI(Check đạo văn/Lạc đề)</th>
+                        <th>AI(Gợi ý cải thiện)</th>
                         
                     </tr>
                 </thead>
@@ -138,13 +139,74 @@
                                                 <h6 class="fw-bold mb-3 text-secondary uppercase"><i class="fas fa-comment-dots me-2"></i>Nhận xét chuyên sâu(Lạc đề):</h6>
                                                 <div class="bg-white p-3 rounded border" style="white-space: pre-wrap; line-height: 1.8; color: #444;">${h.relevanceAnalysis}</div>                                                
                                             </div>
-                                            <div class="modal-footer border-0">
-                                                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Đóng</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </td>
+
+                            <td>
+                                <c:if test="${not empty h.aiRequestPrompt}">
+                                    <button class="btn btn-sm btn-light border btn-analysis" 
+                                            data-bs-toggle="modal" data-bs-target="#improvementModal${loop.index}"
+                                            title="Xem đề xuất cải thiện">
+                                        <i class="fas fa-rocket text-warning"></i>
+                                    </button>
+
+                                    <div class="modal fade" id="improvementModal${loop.index}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-xl">
+                                            <div class="modal-content border-0 shadow-lg">
+                                                <div class="modal-header border-0 bg-warning text-dark">
+                                                    <h5 class="modal-title fw-bold">
+                                                        <i class="fas fa-magic me-2"></i>Chiến lược cải thiện đồ án từ AI
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-4 bg-light">
+                                                    <div class="row g-4">
+                                                        <div class="col-md-7">
+                                                            <div class="card border-0 shadow-sm mb-4">
+                                                                <div class="card-body">
+                                                                    <h6 class="fw-bold text-primary text-uppercase small"><i class="fas fa-search-plus me-2"></i>Phân tích trọng tâm</h6>
+                                                                    <hr>
+                                                                    <div class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${h.focusAnalysis}</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card border-0 shadow-sm">
+                                                                <div class="card-body">
+                                                                    <h6 class="fw-bold text-success text-uppercase small"><i class="fas fa-clipboard-list me-2"></i>Quan sát chung</h6>
+                                                                    <hr>
+                                                                    <div class="text-secondary" style="white-space: pre-wrap; line-height: 1.6;">${h.generalObservations}</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="col-md-5">
+                                                            <div class="card border-0 shadow-sm mb-4 border-top border-4 border-danger">
+                                                                <div class="card-body">
+                                                                    <h6 class="fw-bold text-danger text-uppercase small"><i class="fas fa-star me-2"></i>Ưu tiên hàng đầu</h6>
+                                                                    <div class="p-3 bg-danger bg-opacity-10 rounded mt-2 text-danger fw-bold shadow-sm">
+                                                                        ${h.topPrior}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="card border-0 shadow-sm bg-dark">
+                                                                <div class="card-body">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                        <h6 class="fw-bold text-light text-uppercase small mb-0 font-monospace">AI Request Prompt</h6>
+                                                                    </div>
+                                                                    <div class="text-info small p-2" style="max-height: 150px; overflow-y: auto; font-family: 'Courier New', monospace; background: #1a1a1a;">
+                                                                        ${h.aiRequestPrompt}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>                                    
+                                </c:if>
+                            </td>                            
                         </tr>
                     </c:forEach>
 
@@ -161,7 +223,6 @@
         </div>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -80,7 +80,9 @@ public class LecturerController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding("UTF-8"); 
+        response.setCharacterEncoding("UTF-8"); 
+        response.setContentType("text/html; charset=UTF-8");
         String action = request.getPathInfo();
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
@@ -118,6 +120,7 @@ public class LecturerController extends HttpServlet {
                     break;
                 case "/profile/deactivate":
                     handleDeactiveUser(request,response,user);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -196,17 +199,16 @@ public class LecturerController extends HttpServlet {
     
     
     public void handleSendEmail(HttpServletRequest request, HttpServletResponse response) throws IOException{
-//        try{
-//            String email = request.getParameter("email");
-//            String message = request.getParameter("message-email");
-//            String subject = ;
-//            boolean isSuccess = emailService.sendEmail(email, subject, email);
-//            
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            response.sendRedirect(request.getContextPath() + "/lecturer/GuidedStudentList?msg=system_error");
-//            return;
-//        }
+        try{
+            String email = request.getParameter("email");
+            String message = request.getParameter("message-email");
+            emailService.sendEmailToStudent(email,  message);
+            response.sendRedirect(request.getContextPath() + "/lecturer/GuidedStudentList?msg=success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() + "/lecturer/GuidedStudentList?msg=system_error");
+            return;
+        }
     }
     private void handleStudentUpdateGPA(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try{

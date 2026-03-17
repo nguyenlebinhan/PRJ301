@@ -4,6 +4,7 @@
  */
 package controller;
 
+import com.google.gson.JsonElement;
 import service.AIService;
 import com.google.gson.JsonObject;
 import dao.LecturerDAO;
@@ -13,6 +14,7 @@ import dao.ThesisHistoryDAO;
 import dao.TopicDAO;
 import dao.TopicRegistrationDAO;
 import dao.UserDAO;
+import dto.ImprovementRequest;
 import dto.StudentProfileRequestDTO;
 import dto.ThesisHistoryResponse;
 import dto.ThesisUpdateRequest;
@@ -42,9 +44,9 @@ import java.util.logging.*;
  * @author ADMIN
  */
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-    maxFileSize = 1024 * 1024 * 10,      // 10MB
-    maxRequestSize = 1024 * 1024 * 50    // 50MB
+    fileSizeThreshold = 1024 * 1024 * 2, 
+    maxFileSize = 1024 * 1024 * 10,      
+    maxRequestSize = 1024 * 1024 * 50    
 )
 
 public class StudentController extends HttpServlet {
@@ -62,16 +64,15 @@ public class StudentController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getPathInfo();
         
-        // 1. Kiểm tra bảo mật (Auth Check)
+        
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
-        
         if (user == null || !"STUDENT".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/auth/login");
             return;
         }
 
-        // 2. Điều hướng action
+        
         switch (action != null ? action : "") {
             case "/dashboard":
                 showDashboard(request, response, user);
@@ -80,17 +81,17 @@ public class StudentController extends HttpServlet {
                 logoutUser(request, response);
                 break;  
             case "/topics":
-                showTopicList(request,response);
+                showTopicList(request,response,user);
                 break;
             
             case "/topic/register":
                 showTopicRegistration(request, response);
                 break;
             case "/profile":
-                showProfile(request,response);
+                showProfile(request,response,user);
                 break;
             case "/thesis/history":
-                showThesisHistory(request,response);
+                showThesisHistory(request,response,user);
                 break;
             default:
                 response.sendError(404);
@@ -102,7 +103,7 @@ public class StudentController extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getPathInfo();
         
-        // 1. Kiểm tra bảo mật (Auth Check)
+        
         HttpSession session = request.getSession(false);
         User user = (session != null) ? (User) session.getAttribute("user") : null;
         
@@ -111,7 +112,7 @@ public class StudentController extends HttpServlet {
             return;
         }
 
-        // 2. Điều hướng action
+        
         switch (action != null ? action : "") {
             case "/dashboard":
                 showDashboard(request, response, user);
@@ -126,7 +127,7 @@ public class StudentController extends HttpServlet {
                 handleAddThesis(request,response,user);
                 break;
             case "/profile/update":
-                handleUpdateProfile(request,response);
+                handleUpdateProfile(request,response,user);
                 break;
             case "/thesis/update":
                 handleThesisUpdate(request,response,user);
@@ -134,6 +135,8 @@ public class StudentController extends HttpServlet {
             case "/profile/deactivate":
                 handleDeactiveUser(request,response,user);
                 break;
+            case "/thesis/ai-advice":
+                handleImprovementThesis(request,response,user);
             default:
                 //response.sendError(404);
                 break;
@@ -150,7 +153,7 @@ public class StudentController extends HttpServlet {
     }    
     private void showDashboard(HttpServletRequest request, HttpServletResponse response, User user) 
             throws ServletException, IOException {
-        // Lấy thông tin chi tiết để hiển thị lên Dashboard
+        
         Student student = studentDAO.getStudentByUserId(user.getId());
         //List<Topic> topics = topicDao.
         TopicThesisDTO topicThesis = topicDao.getAcceptedTopic(student.getMssv());
@@ -166,21 +169,19 @@ public class StudentController extends HttpServlet {
         request.getRequestDispatcher("/jsp/student/dashboard.jsp").forward(request, response);
     }
 
-    private void showThesisHistory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");        
+    private void showThesisHistory(HttpServletRequest request, HttpServletResponse response,User user) throws ServletException, IOException {      
         Student student = studentDAO.getStudentByUserId(user.getId());
         String thesisIdParam = request.getParameter("thesisId");
     
         if (thesisIdParam != null && !thesisIdParam.isEmpty()) {
             int thesisId = Integer.parseInt(thesisIdParam);
 
-            // Gọi DAO lấy danh sách lịch sử
+            
             List<ThesisHistoryResponse> historyList = thesisHistoryDAO.getThesisHistory(student.getMssv(),thesisId);
             ThesisHistoryResponse th = thesisHistoryDAO.getNameAndtopicCode(student.getMssv(), thesisId);
 
             
-            // Import java.time.format.DateTimeFormatter;
+            
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
             request.setAttribute("dateFormatter", formatter); 
             request.setAttribute("historyList", historyList);
@@ -191,18 +192,13 @@ public class StudentController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
         }
     }    
-    private void showTopicList(HttpServletRequest request, HttpServletResponse response) 
+    private void showTopicList(HttpServletRequest request, HttpServletResponse response,User user) 
             throws ServletException, IOException {
-        // 1. Lấy thông tin sinh viên hiện tại từ Session
-        HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
         Student student = studentDAO.getStudentByUserId(user.getId());
 
-        // 2. Lấy danh sách đề tài còn trống
+   
         List<Topic> topics = topicDao.getAvailableTopics();
 
-        // 3. Lấy danh sách ID các đề tài mà sinh viên này ĐÃ đăng ký
-        // Chúng ta sẽ dùng hàm này để kiểm tra nhanh trong vòng lặp
         List<TopicRegistration> myRegistrations = topicRegistrationDao.getRegistrationsByStudent(student.getMssv());
 
         request.setAttribute("topics", topics);
@@ -210,22 +206,19 @@ public class StudentController extends HttpServlet {
         request.getRequestDispatcher("/jsp/student/topic-list.jsp").forward(request, response);        
 
     }
-    private void showProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 1. Lấy thông tin sinh viên hiện tại từ Session
-        HttpSession session = request.getSession(false);
-        User user = (User) session.getAttribute("user");
+    private void showProfile(HttpServletRequest request, HttpServletResponse response,User user) throws ServletException, IOException {
+
         Student student = studentDAO.getStudentByUserId(user.getId());
 
         request.setAttribute("student", student);
         request.getRequestDispatcher("/jsp/student/profile.jsp").forward(request, response);         
     }
-    
-    private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession session = request.getSession(false);
+
+  
+    private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response,User user) throws IOException {
         String redirectPath = request.getContextPath() + "/student/profile";
 
         try {
-            User user = (User) session.getAttribute("user");
             Student student = studentDAO.getStudentByUserId(user.getId());
 
             // Lấy dữ liệu và thực hiện logic
@@ -243,13 +236,13 @@ public class StudentController extends HttpServlet {
             boolean isUpdated = studentDAO.updateFullProfile(updatedStudent);
 
             if (isUpdated) {
-                session.setAttribute("success", "Cập nhật thành công profile.");
+                request.getSession().setAttribute("success", "Cập nhật thành công profile.");
             } else {
-                session.setAttribute("error", "Không thể cập nhật profile.");
+                request.getSession().setAttribute("error", "Không thể cập nhật profile.");
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Lỗi khi xử lý cập nhật Profile", e);
-            session.setAttribute("error", "Hệ thống gặp sự cố kỹ thuật.");
+            request.getSession().setAttribute("error", "Hệ thống gặp sự cố kỹ thuật.");
         } finally {
             if (!response.isCommitted()) {
                 response.sendRedirect(redirectPath);
@@ -273,7 +266,6 @@ public class StudentController extends HttpServlet {
 
             filePart.write(uploadPath + File.separator + fileName);
 
-            // 2. Tạo URL nội bộ để Python có thể truy cập vào file vừa upload
             String fileUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
                              + request.getContextPath() + "/uploads/" + fileName;
 
@@ -323,7 +315,7 @@ public class StudentController extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Lỗi vô hiệu hóa user id: " + user.getId(), e);
             response.sendRedirect(request.getContextPath() + "/auth/login?error=system_error");
         }          
-    }
+    }    
     private void handleAddThesis(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         try {
             Student student = studentDAO.getStudentByUserId(user.getId());
@@ -336,14 +328,11 @@ public class StudentController extends HttpServlet {
             String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) uploadDir.mkdir();
-
-            filePart.write(uploadPath + File.separator + fileName);
-
-            // 2. Tạo URL nội bộ để Python có thể truy cập vào file vừa upload
+            filePart.write(uploadPath + File.separator + fileName); 
             String fileUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
                              + request.getContextPath() + "/uploads/" + fileName;
-
-            // 3. Gọi AI bằng URL của file vừa nộp
+            
+            
             AIService aiService = new AIService();
             JsonObject plagiarismResult = aiService.checkPlagiarismAuto(fileUrl);
             JsonObject relevanceResult = aiService.checkTopicRelevant(fileUrl,topicName );
@@ -354,7 +343,6 @@ public class StudentController extends HttpServlet {
             double relevantTopicScore = relevanceResult.get("relevance_score").getAsDouble();
             String relevanceStatus = relevanceResult.get("relevance_status").getAsString();
             String relevanceAnalysis = relevanceResult.get("relevance_analysis").getAsString();
-            // 4. Lưu vào Database (Lưu fileUrl vào cột reportFile)
             Thesis newThesis = new Thesis(
                 Integer.parseInt(request.getParameter("topicId")),
                 student.getMssv(), supervisor.getMscv(),
@@ -368,77 +356,87 @@ public class StudentController extends HttpServlet {
             newThesis.setRelevantTopicStatus(relevanceStatus);
             newThesis.setRelevanceAnalysis(relevanceAnalysis);
             thesisDAO.createThesis(newThesis);
-
             request.getSession().setAttribute("success", "Upload và kiểm tra AI thành công!");
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
-
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Lỗi upload file", e);
             response.sendRedirect(request.getContextPath() + "/student/dashboard?error=upload");
         }
     }
+    private void handleImprovementThesis(HttpServletRequest request, HttpServletResponse response, User user) throws IOException {
+        try {
+            String reportFile = request.getParameter("reportFile");
+            String userPrompt = request.getParameter("userPrompt");
+            int thesisId = Integer.parseInt(request.getParameter("thesisId"));
+            AIService aiService = new AIService();
+            
+            JsonObject improvementResult = aiService.suggestImprovements(reportFile,userPrompt);
+            String focusAnalysis = improvementResult.get("focus_analysis").getAsString();
+            String generalObservation = improvementResult.get("general_observations").getAsString();
+            JsonElement topPriorElement = improvementResult.get("top_3_priorities");
+            String topPrior;
+            if (topPriorElement.isJsonArray()) {
+                StringBuilder sb = new StringBuilder();
+                int count = 1;
+                for (JsonElement e : topPriorElement.getAsJsonArray()) {
+                    sb.append(count++).append(". ").append(e.getAsString()).append("; ");
+                }
+                topPrior = sb.toString();
+            } else {
+                topPrior = topPriorElement.getAsString();
+            }
+            ImprovementRequest Iprequest = new ImprovementRequest(focusAnalysis,generalObservation,topPrior,userPrompt,thesisId);
+            thesisDAO.updateAnalysis(Iprequest);
+            request.getSession().setAttribute("success", "AI cải tiến thành công!");
+            response.sendRedirect(request.getContextPath() + "/student/dashboard");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Lỗi upload file", e);
+            response.sendRedirect(request.getContextPath() + "/student/dashboard?error=upload");
+        }        
+    }    
     private void handleRegisterTopic(HttpServletRequest request, HttpServletResponse response, User user) 
         throws IOException {
         try {
-            // A. Lấy dữ liệu từ Form
+            
             String topicCode = request.getParameter("topicCode");
             String mscvHD = request.getParameter("mscvHD");
-            int topicIdRaw = Integer.parseInt(request.getParameter("topicId"));
-                 
-
-            // B. Lấy thông tin sinh viên hiện tại
+            int topicIdRaw = Integer.parseInt(request.getParameter("topicId"));  
             Student student = studentDAO.getStudentByUserId(user.getId());
-
-            // C. Kiểm tra xem SV đã đăng ký đề tài này (hoặc đề tài khác) chưa
             if (topicRegistrationDao.hasAlreadyRegistered(student.getMssv(), topicIdRaw)) {
                 request.getSession().setAttribute("error", "Bạn đã gửi yêu cầu đăng ký cho đề tài này rồi!");
                 response.sendRedirect(request.getContextPath() + "/student/topics");
                 return;
             }
-            
-
-            // D. Tạo đối tượng đăng ký
             TopicRegistration reg = new TopicRegistration(topicIdRaw,topicCode,"PENDING", student.getMssv(),mscvHD);
-
-            // E. Lưu vào Database
-            if (topicRegistrationDao.createRegistration(reg)) {
-                // Đăng ký thành công, đẩy thông báo vào session để hiển thị sau khi redirect
+            if (topicRegistrationDao.createRegistration(reg)) {     
                 request.getSession().setAttribute("success", "Gửi yêu cầu đăng ký thành công! Đang chờ giảng viên phê duyệt.");
             } else {
                 request.getSession().setAttribute("error", "Có lỗi xảy ra trong quá trình đăng ký.");
             }
-            
-
-            // Quay về Dashboard để SV theo dõi trạng thái
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
-
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/student/topics?error=system");
         }
         
     }    
-// Cập nhật phương thức xử lý hiển thị form
     private void showTopicRegistration(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        try {
-            // 1. Lấy topicId từ URL (ví dụ: /topic/register?topicId=5)
+        try {            
             String idParam = request.getParameter("topicId");
             if (idParam != null) {
                 int topicId = Integer.parseInt(idParam); 
                 List<Lecturer> lecturers = lecturerDao.getAvailableLecturers();
-       
                 request.setAttribute("lecturers", lecturers);
                 request.setAttribute("selectedTopicId", topicId);
                 request.getRequestDispatcher("/jsp/student/topic-registration.jsp").forward(request, response);
                 return;
                 
             }
-            // Nếu không có ID hoặc không tìm thấy, quay về danh sách
             response.sendRedirect(request.getContextPath() + "/student/topics");
-
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/student/topics?error=invalid_id");
         }
     }
+
 
 }

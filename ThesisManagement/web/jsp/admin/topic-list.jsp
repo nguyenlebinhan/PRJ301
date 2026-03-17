@@ -156,7 +156,7 @@
                             </tr>
                         </c:forEach>
                         
-                        <%-- Trường hợp danh sách trống --%>
+                        
                         <c:if test="${empty listTopic}">
                             <tr>
                                 <td colspan="6" class="text-center py-5">

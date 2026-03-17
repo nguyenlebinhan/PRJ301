@@ -23,6 +23,10 @@ public class AuthFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");        
+        
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         
@@ -31,7 +35,8 @@ public class AuthFilter implements Filter {
         
         
 
-        if (requestURI.contains("/login") || 
+        if (requestURI.contains("/login") ||
+            requestURI.contains("/register") ||
             requestURI.contains("/forget-password") || 
             requestURI.contains("/reset-password") ||  
             requestURI.contains("/css/") || 

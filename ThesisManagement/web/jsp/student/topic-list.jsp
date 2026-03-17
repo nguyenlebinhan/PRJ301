@@ -12,7 +12,7 @@
 <body class="bg-light">
     <div class="container py-5">
 
-        <%-- HIỂN THỊ THÔNG BÁO LỖI (Nếu có) --%>
+        
         <c:if test="${not empty sessionScope.error}">
             <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
                 <div class="d-flex align-items-center">

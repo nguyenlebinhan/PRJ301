@@ -14,8 +14,7 @@ SELECT t.*, l.fullName as lecturerName, l.researchField  FROM Topics t LEFT JOIN
 SELECT t.* from Topics t WHERE t.title LIKE '%B%' 
 Select l.* from TopicRegistrations tr inner join Lecturers l on l.mscv=tr.mscvHD where tr.mssv = 'SV001' and tr.status='ACCEPTED'
 
-DELETE FROM Topics 
-                     WHERE topicId = 3 AND createdBy = 'GV001'
+DELETE FROM Topics WHERE topicId = 3 AND createdBy = 'GV001'
 
 select t.topicId,t.title,t.topicCode,tr.mssv,t.description,t.technicalRequirements,t.difficultyScore,th.thesisId,th.reportFile,th.sourceCodeLink from TopicRegistrations tr INNER JOIN Topics t on tr.topicId = t.topicId left join Theses th on th.topicId=t.topicId WHERE tr.mssv = 'SV001' AND tr.status = 'ACCEPTED'
 select * from ThesisHistory ;
@@ -39,7 +38,11 @@ BEGIN
         plagiarism_analysis,
         relevantTopicScore,
         relevantTopicStatus,
-        relevance_analysis
+        relevance_analysis,
+        focus_analysis ,
+        general_observations,
+        top_three_prior,
+        aiRequestPrompt
 
     )
     SELECT 
@@ -54,7 +57,11 @@ BEGIN
         i.plagiarism_analysis,
         i.relevantTopicScore,
         i.relevantTopicStatus,
-        i.relevance_analysis
+        i.relevance_analysis,
+        i.focus_analysis ,
+        i.general_observations,
+        i.top_three_prior,
+        i.aiRequestPrompt
     FROM 
         inserted i;
 END;
@@ -126,6 +133,7 @@ BEGIN
         RAISERROR(@Err, 16, 1);
     END CATCH
 END
+GO
 
 CREATE PROCEDURE sp_DeleteTopic (@TopicId INT, @ExecutedByUserId INT)
 AS
@@ -166,6 +174,7 @@ BEGIN
         RAISERROR(@ErrMsg, 16, 1);
     END CATCH
 END
+GO
 
 SELECT th.* FROM ThesisHistory th INNER JOIN Theses t on t.thesisId = th.thesisId INNER JOIN Topics topics on topics.topicId = t.topicId WHERE th.mssv = 'SV001' AND th.thesisId = '1'  ORDER BY createdAt DESC
 select Count(thesisId) as numberOfReport from Theses where mscvHD = ;

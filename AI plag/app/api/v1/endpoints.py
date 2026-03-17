@@ -1,103 +1,21 @@
-import io
 import re
-import urllib.parse
-import numpy as np
-import requests
-import urllib3
 import json
-from fastapi import FastAPI
-from pydantic import BaseModel
-from bs4 import BeautifulSoup
-from docx import Document
-import fitz  
+from unittest import result
+import numpy as np
+from fastapi import APIRouter
 from ddgs import DDGS
-import os
-from dotenv import load_dotenv
-from openai import OpenAI
 
-app = FastAPI() 
+# Import từ các module bạn đã chia
+from app.models.schemas import ThesisRequest, TopicRelevanceRequest, ImprovementRequest
+from app.utils import scraper, text_process
+from app.services import ai_service
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-env_path = os.path.join(base_dir, '.env')
+router = APIRouter()
 
-
-if load_dotenv(dotenv_path=env_path):
-    print(f" Đã tìm thấy và tải file .env tại: {env_path}")
-else:
-    print(f" KHÔNG tìm thấy file .env tại: {env_path}")
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-
-if not OPENAI_API_KEY:
-    print(" LỖI: Biến OPENAI_API_KEY đang trống!")
-else:
-    print(f"Key đã sẵn sàng (4 ký tự đầu): {OPENAI_API_KEY[:4]}")
-
-
-client = OpenAI(api_key=OPENAI_API_KEY)
-
-
-class ThesisRequest(BaseModel):
-    report_url: str
-    
-class TopicRelevanceRequest(BaseModel):        
-    report_url: str
-    topic_title: str
-    
-print("--- Hệ thống Plagiarism Hybrid PRO  - FPT University Edition ---")
-
-def get_content_from_url(url: str, timeout=7):
-    """Cào dữ liệu với timeout ngắn để tránh treo hệ thống"""
-    try:
-        parsed_url = urllib.parse.urlparse(url)
-        safe_url = f"{parsed_url.scheme}://{parsed_url.netloc}{urllib.parse.quote(parsed_url.path)}"
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-        
-        response = requests.get(safe_url, headers=headers, timeout=timeout, verify=False)
-        response.raise_for_status()
-        content = response.content
-
-        if url.lower().endswith(".pdf"):
-            with fitz.open(stream=io.BytesIO(content), filetype="pdf") as doc:
-                return " ".join([page.get_text() for page in doc]).strip()
-        elif url.lower().endswith(".docx"):
-            doc = Document(io.BytesIO(content))
-            return " ".join([p.text for p in doc.paragraphs]).strip()
-        else:
-            soup = BeautifulSoup(content, 'html.parser')
-            for r in soup(["script", "style", "nav", "footer", "header", "aside"]): r.decompose()
-            return " ".join([t.get_text().strip() for t in soup.find_all(['p', 'h1', 'h2', 'h3'])]).strip()
-    except:
-        return ""
-
-def embed_texts_batch(texts):
-    if not texts: return []
-    try:
-        resp = client.embeddings.create(model="text-embedding-3-small", input=texts)
-        return [item.embedding for item in resp.data]
-    except Exception as e:
-        print(f"      [!] Lỗi API Embedding: {e}")
-        return []
-
-def split_into_sentences(text: str, min_words: int = 15):
-    raw = re.split(r'(?<=[\.!?])\s+', text)
-    sentences, buffer = [], ""
-    for s in raw:
-        s = s.strip()
-        if not s: continue
-        if len((buffer + " " + s).split()) < min_words:
-            buffer = (buffer + " " + s).strip()
-        else:
-            if buffer: sentences.append(buffer)
-            buffer = s
-    if buffer: sentences.append(buffer)
-    return sentences
-
-@app.post("/check-plagiarism-auto")
+@router.post("/check-plagiarism-auto")
 async def check_plagiarism_auto(request: ThesisRequest):
     print(f"\n[BƯỚC 1] Nhận file: {request.report_url.split('/')[-1]}")
-    thesis_text = get_content_from_url(request.report_url)
+    thesis_text = scraper.get_content_from_url(request.report_url)
     word_count = len(thesis_text.split())
     
     if word_count < 30:
@@ -123,16 +41,16 @@ async def check_plagiarism_auto(request: ThesisRequest):
 
     
     print(f"[BƯỚC 3] Đang quét {len(found_urls)} website...")
-    thesis_sentences = split_into_sentences(thesis_text)
-    thesis_vecs = np.array(embed_texts_batch(thesis_sentences))
+    thesis_sentences = text_process.split_into_sentences(thesis_text)
+    thesis_vecs = np.array(ai_service.embed_texts_batch(thesis_sentences))
     
     source_rankings = []
     for url in found_urls:
-        src_text = get_content_from_url(url)
+        src_text = scraper.get_content_from_url(url)
         if len(src_text) < 150: continue
         
-        src_sentences = split_into_sentences(src_text)
-        src_vecs = np.array(embed_texts_batch(src_sentences))
+        src_sentences = text_process.split_into_sentences(src_text)
+        src_vecs = np.array(ai_service.embed_texts_batch(src_sentences))
         if src_vecs.size == 0: continue
 
         sim_matrix = np.dot(thesis_vecs, src_vecs.T)
@@ -154,7 +72,7 @@ async def check_plagiarism_auto(request: ThesisRequest):
 
     print(f"[BƯỚC 4] Sentence embedding models đang thẩm định ...")
     try:
-        response = client.chat.completions.create(
+        response = ai_service.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "Bạn là chuyên gia bắt đạo văn khắt khe của FPT. Nhiệm vụ của bạn là tìm ra sự trùng lặp ý tưởng. Kể cả khi sinh viên thay đổi từ ngữ nhưng cấu trúc và ý chính giống nguồn, bạn vẫn phải cho điểm đạo văn cao."},
@@ -196,12 +114,12 @@ async def check_plagiarism_auto(request: ThesisRequest):
         print(f"   [!] Lỗi GPT: {e}")
         return {"similarity_score": round(best_match['score']*100, 2), "plagiarism_status": "Lỗi AI", "best_source": best_match['url']}
 
-@app.post("/check-topic-relevance")
+@router.post("/check-topic-relevance")
 async def check_topic_relevance(request: TopicRelevanceRequest):
     print(f"\n[KIỂM TRA LẠC ĐỀ] Đang xử lý đề tài: {request.topic_title}")
     
     
-    doc_text = get_content_from_url(request.report_url)
+    doc_text = scraper.get_content_from_url(request.report_url)
     if not doc_text or len(doc_text) < 100:
         return {"relevance_score": 0.0, "is_on_topic": False, "analysis": "Tài liệu trống hoặc quá ngắn."}
 
@@ -209,7 +127,7 @@ async def check_topic_relevance(request: TopicRelevanceRequest):
     content_to_analyze = doc_text[:2000]
 
     try:
-        response = client.chat.completions.create(
+        response = ai_service.client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {
@@ -257,3 +175,94 @@ async def check_topic_relevance(request: TopicRelevanceRequest):
     except Exception as e:
         print(f" [!] Lỗi AI Relevance: {e}")
         return {"relevance_score": 0.0, "is_on_topic": False, "relevance_analysis": "Lỗi hệ thống khi thẩm định."}    
+
+
+def safe_text(text):
+    if not text: return ""
+    text = text.replace("{", "[").replace("}", "]").replace('"', "'")
+    text = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', text)
+    return text.strip()
+    
+@router.post("/suggest-improvements")
+async def suggest_improvements(request: ImprovementRequest):
+    focus = request.focus_area if request.focus_area else "tổng thể"
+    print(f"\n[ĐỀ XUẤT CẢI THIỆN] Đang xử lý khía cạnh: {focus}")
+    
+    
+    doc_text = scraper.get_content_from_url(request.report_url)
+    if not doc_text or len(doc_text) < 100:
+        return {
+            "focus_analysis": "N/A",
+            "general_observations": "Tài liệu trống hoặc quá ngắn.",
+            "top_3_priorities": ["Kiểm tra lại file upload"]
+        }
+    chunk_list = text_process.chunk_text(doc_text)
+    print(f"[HỆ THỐNG] Đã chia luận án thành {len(chunk_list)} phần. Bắt đầu phân tích chuyên sâu...")
+    
+    try:
+        partial_analyses = []
+       
+        for i, chunk in enumerate(chunk_list[:5]):
+            print(f"   [+] Đang thẩm định phần {i+1}...")
+            resp = ai_service.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": f"Bạn là chuyên gia thẩm định luận án tại FPT. Hãy phân tích đoạn văn sau, tập trung vào: {focus}."},
+                    {"role": "user", "content": chunk}
+                ]
+            )
+            partial_analyses.append(resp.choices[0].message.content)
+
+       
+        print(f"[BƯỚC CUỐI] Mentor AI đang tổng hợp báo cáo cải thiện...")
+        final_response = ai_service.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system", 
+                    "content": "Bạn là Mentor hướng dẫn đồ án. Dựa trên các phân tích chi tiết, hãy trả về kết quả JSON."
+                },
+                {
+                    "role": "user", 
+                    "content": f"""
+                        YÊU CẦU TRỌNG TÂM: {focus}
+                        DỮ LIỆU PHÂN TÍCH: {' '.join(partial_analyses)}
+                        ---
+                        YÊU CẦU TRẢ VỀ JSON:
+                        1. focus_analysis: Nhận xét chi tiết về phần {focus}.
+                        2. general_observations: Các nhận xét tổng quát khác về bài làm.
+                        3. top_3_priorities: Danh sách (array) 3 việc cần làm ngay để cải thiện lỗi {focus}.
+
+                        {{
+                            "focus_analysis": "string",
+                            "general_observations": "string",
+                            "top_3_priorities": ["việc 1", "việc 2", "việc 3"]
+                        }}
+                    """
+                }
+            ],
+            response_format={ "type": "json_object" }
+        )
+        
+        result = json.loads(final_response.choices[0].message.content)
+
+        
+        print("-" * 50)
+        print(f" YÊU CẦU TẬP TRUNG: {focus}")
+        print(f" NHẬN XÉT: {result.get('focus_analysis')[:150]}...")
+        print(f" ƯU TIÊN: {', '.join(result.get('top_3_priorities', []))}")
+        print("-" * 50)
+        
+        return {
+            "focus_analysis": result.get("focus_analysis", "Không có phân tích."),
+            "general_observations": result.get("general_observations", "Không có nhận xét."),
+            "top_3_priorities": result.get("top_3_priorities", ["Cần xem xét thêm"])
+        }
+
+    except Exception as e:
+        print(f" [!] Lỗi AI Improvement: {e}")
+        return {
+            "focus_analysis": "Lỗi hệ thống khi phân tích chuyên sâu.",
+            "general_observations": str(e),
+            "top_3_priorities": ["Thử lại sau", "Liên hệ hỗ trợ kỹ thuật"]
+        }

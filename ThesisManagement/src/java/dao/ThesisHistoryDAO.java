@@ -79,6 +79,11 @@ public class ThesisHistoryDAO extends DBContext {
                     th.setRelevantTopicScore(rs.getDouble("relevantTopicScore"));
                     th.setRelevantTopicStatus(rs.getString("relevantTopicStatus"));
                     th.setRelevanceAnalysis(rs.getString("relevance_analysis"));
+                    th.setFocusAnalysis(rs.getNString("focus_analysis"));
+                    th.setGeneralObservations(rs.getNString("general_observations"));
+                    th.setTopPrior(rs.getNString("top_three_prior"));
+                    th.setAiRequestPrompt(rs.getNString("aiRequestPrompt"));
+                    
                     thesisHistory.add(th);
                 }
             }

@@ -3,14 +3,11 @@ package controller;
 import dao.LecturerDAO;
 import dao.StudentDAO;
 import dao.ThesisDAO;
-import dao.ThesisHistoryDAO;
 import dao.TopicDAO;
-import dao.TopicRegistrationDAO;
 import dao.UserDAO;
 import dto.AddingUserRequest;
 import dto.AdminInformationRequest;
 import dto.AdminListThesis;
-import dto.StudentProgressDTO;
 import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -33,11 +30,9 @@ public class AdminController extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(AdminController.class.getName());
     private final UserDAO userDAO = new UserDAO();
     private final TopicDAO topicDAO = new TopicDAO();
-    private final TopicRegistrationDAO registrationDAO = new TopicRegistrationDAO();
     private final ThesisDAO thesisDAO = new ThesisDAO();
     private final LecturerDAO lecturerDao = new LecturerDAO();
     private final StudentDAO studentDao = new StudentDAO();
-    private final ThesisHistoryDAO thesisHistoryDAO = new ThesisHistoryDAO();    
     private final EmailService emailService = new EmailService();
 
     @Override
