@@ -121,7 +121,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Họ và tên</label>
-                        <input type="text" name="fullName" class="form-control" value="${student.fullName}" required>
+                        <input type="text" name="fullName" class="form-control" value="${student.fullName}" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Số điện thoại</label>
@@ -129,19 +129,19 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Email cá nhân</label>
-                        <input type="email" name="email" class="form-control" value="${student.email}" required>
+                        <input type="email" name="email" class="form-control" value="${student.email}" readonly>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tên lớp</label>
-                        <input type="text" name="className" class="form-control" value="${student.className}" required>
+                        <input type="text" name="className" class="form-control" value="${student.className}" readonly>
                     </div>   
                     <div class="mb-3">
                         <label class="form-label fw-bold">Tên ngành</label>
-                        <input type="text" name="major" class="form-control" value="${student.major}" required>
+                        <input type="text" name="major" class="form-control" value="${student.major}" readonly>
                     </div>   
                     <div class="mb-3">
                         <label class="form-label fw-bold">Các kĩ năng</label>
-                        <input type="text" name="skills" class="form-control" value="${student.skills}" required>
+                        <input type="text" name="skills" class="form-control" value="${student.skills}" readonly>
                     </div>                       
                 </div>
                 <div class="modal-footer">

@@ -4,6 +4,7 @@ import dal.DBContext;
 import dto.AdminInformationRequest;
 import dto.AdminListThesis;
 import dto.ImprovementRequest;
+import dto.ScoreUpdateRequest;
 import dto.StudentProgressDTO;
 import dto.ThesisUpdateRequest;
 import dto.TopicThesisDTO;
@@ -14,9 +15,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Data Access Object cho Thesis
- */
 public class ThesisDAO {
     private static final Logger LOGGER = Logger.getLogger(ThesisDAO.class.getName());
     private final DBContext dbContext;
@@ -88,13 +86,13 @@ public class ThesisDAO {
     }    
     public List<StudentProgressDTO> getStudentProgress(String mscv){
         List<StudentProgressDTO> studentList = new ArrayList<>();
-        String sql = "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where th.mscvHD=?";
+        String sql = "select s.fullName,s.mssv,th.thesisId,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where th.mscvHD=?";
         try(Connection conn = dbContext.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setString(1, mscv);
             try(ResultSet rs = ps.executeQuery()){
                 if(rs.next()){
-                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("mssv"),rs.getInt("thesisId"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
                     studentList.add(s);
                 }
             }
@@ -105,12 +103,12 @@ public class ThesisDAO {
     }
     public List<StudentProgressDTO> getAllStudentProgress(){
         List<StudentProgressDTO> studentList = new ArrayList<>();
-        String sql = "select s.fullName,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where 1=1";
+        String sql = "select s.fullName,s.mssv,th.thesisId,th.reportFile,th.sourceCodeLink,th.similarityScore,th.plagiarismStatus,th.bestSource,th.relevantTopicScore,th.relevantTopicStatus from Theses th join Students s on s.mssv = th.mssv where 1=1";
         try(Connection conn = dbContext.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             try(ResultSet rs = ps.executeQuery()){
                 if(rs.next()){
-                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
+                    StudentProgressDTO s= new StudentProgressDTO(rs.getNString("fullName"),rs.getString("mssv"),rs.getInt("thesisId"),rs.getString("reportFile"),rs.getString("sourceCodeLink"),rs.getInt("similarityScore"),rs.getString("plagiarismStatus"),rs.getString("bestSource"),rs.getDouble("relevantTopicScore"),rs.getString("relevantTopicStatus"));
                     studentList.add(s);
                 }
             }
@@ -248,6 +246,7 @@ public class ThesisDAO {
         }
     }
 
+    
     public boolean updateThesis(Thesis thesis) {
         String sql = "UPDATE Theses SET reportFile = ?, sourceCodeLink = ?, status = ?,similarityScore = ?,plagiarismStatus = ?,bestSource = ?"
                 + " WHERE thesisId = ?";
@@ -269,6 +268,23 @@ public class ThesisDAO {
             return false;
         }
     }
+    public boolean updateScoreInThesis(ScoreUpdateRequest request) {
+        String sql = "UPDATE Theses SET score = ?, feedback = ?"
+                + " WHERE thesisId = ?";
+        
+        try (Connection conn = dbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+           
+            ps.setDouble(1, request.getScore());
+            ps.setNString(2,request.getFeedback());
+            ps.setInt(3, request.getThesisId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating thesis", e);
+            return false;
+        }
+    }    
     
     public int getNumberOfReport(String mscv){
         String sql = "select Count(thesisId) as numberOfReport from Theses where mscvHD = ?";

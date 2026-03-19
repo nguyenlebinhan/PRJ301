@@ -237,6 +237,7 @@
                                 <th>Báo cáo cuối/Source code link</th>
                                 <th>Báo cáo AI(Về đạo văn)</th>
                                 <th>Báo cáo AI(Về lạc đề)</th>
+                                <th>Chấm điểm cho sinh viên</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -267,7 +268,7 @@
 
                                     <td style="min-width: 200px;">
                                         <div class="mb-1 d-flex justify-content-between">
-                                            <small class="fw-bold">Đạo văn: ${s.similarityScore}%</small>
+                                            <small class="fw-bold"> ${s.similarityScore}%</small>
                                             <span class="badge ${s.similarityScore > 30 ? 'bg-danger' : (s.similarityScore > 15 ? 'bg-warning' : 'bg-success')}">
                                                 ${s.plagiarismStatus}
                                             </span>
@@ -287,7 +288,7 @@
 
                                     <td style="min-width: 180px;">
                                         <div class="mb-1 d-flex justify-content-between">
-                                            <small class="fw-bold">Lạc đề: ${s.relevantTopicScore}%</small>
+                                            <small class="fw-bold">${s.relevantTopicScore}%</small>
                                             <span class="badge ${s.relevantTopicScore > 50 ? 'bg-danger' : 'bg-info text-dark'}">
                                                 ${s.relevantTopicStatus}
                                             </span>
@@ -296,6 +297,15 @@
                                             <div class="progress-bar ${s.relevantTopicScore > 50 ? 'bg-danger' : 'bg-info'}" 
                                                  role="progressbar" style="width: ${s.relevantTopicScore}%"></div>
                                         </div>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-warning" 
+                                            title="Thêm điểm cho bài luận văn của sinh viên" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#ScoringModal" 
+                                            onclick="prepareScoreModal('${s.mssv}', '${s.fullName}', '${s.thesisId}','${s.reportFile}','${s.sourceCodeLink}','${s.similarityScore}','${s.plagiarismStatus}','${s.relevantTopicScore}','${s.relevantTopicStatus}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>                                        
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -374,6 +384,111 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="ScoringModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered"> <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-graduation-cap me-2"></i>Chấm điểm luận văn</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <form action="${pageContext.request.contextPath}/lecturer/score" method="POST">
+                <div class="modal-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold">HỌ VÀ TÊN</label>
+                            <input type="text" name="fullName" class="form-control bg-light border-0" id='modalStudentName' readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold">MSSV</label>
+                            <input type="text" name="mssv" class="form-control bg-light border-0" id='modalMssv' readonly>
+                        </div>
+                        <div class="col-12">
+                            <label class="small text-muted fw-bold">FILE BÁO CÁO</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white"><i class="far fa-file-pdf text-danger"></i></span>
+                                <input type="text" name="reportFile" class="form-control bg-light border-start-0" id="modalReportFile" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-light-subtle">
+                                <label class="d-block small text-muted fw-bold mb-2">PHÂN TÍCH ĐẠO VĂN</label>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <input type="text" name="similarityScore" class="form-control-plaintext fw-bold p-0" id='modalSimilarityScore' readonly>
+                                    <span id="plagiarismBadge" class="badge rounded-pill"></span>
+                                </div>
+                                <input type="hidden" name="plagiarismStatus" id='modalPlagiarismStatus'>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border rounded bg-light-subtle">
+                                <label class="d-block small text-muted fw-bold mb-2">ĐỘ TƯƠNG QUAN ĐỀ TÀI</label>
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <input type="text" name="relevantTopicScore" class="form-control-plaintext fw-bold p-0" id='modalRelevantTopicScore' readonly>
+                                    <span id="relevantBadge" class="badge rounded-pill"></span>
+                                </div>
+                                <input type="hidden" name="relevantTopicStatus" id='modalRelevantTopicStatus'>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary bg-opacity-10 p-4 rounded-3 border border-primary border-opacity-25">
+                        <h6 class="text-primary fw-bold mb-3"><i class="fas fa-pen-nib me-2"></i>Đánh giá của Giảng viên</h6>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Điểm số (thang 10)</label>
+                                <div class="input-group input-group-lg">
+                                    <input type="number" name="studentScore" class="form-control border-primary text-primary fw-bold" 
+                                           min="0" max="10" value="0" step="0.1" value="${score}" required>
+                                    <span class="input-group-text bg-primary text-white">/10</span>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-bold">Nhận xét & Phản hồi</label>
+                                <textarea name="feedback" value="${feedback}" class="form-control border-primary" rows="2" placeholder="Nhập nhận xét cho sinh viên..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="thesisId" id="modalThesis">
+                    <input type="hidden" name="sourceCodeLink" id='modalSourceCodeLink'>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold">Xác nhận điểm</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>              
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script> 
+function prepareScoreModal(mssv, fullName, thesisId, reportFile, sourceCodeLink, similarityScore, plagiarismStatus, relevantTopicScore, relevantTopicStatus) {
+    document.getElementById('modalMssv').value = mssv;
+    document.getElementById('modalStudentName').value = fullName;
+    document.getElementById('modalThesis').value = thesisId;
+    document.getElementById('modalReportFile').value = reportFile;
+    document.getElementById('modalSourceCodeLink').value = sourceCodeLink;
+    document.getElementById('modalSimilarityScore').value = similarityScore + "%";
+    document.getElementById('modalRelevantTopicScore').value = relevantTopicScore + "/10";
+
+    
+    const plagBadge = document.getElementById('plagiarismBadge');
+    plagBadge.innerText = plagiarismStatus;
+    plagBadge.className = 'badge rounded-pill ' + 
+        (plagiarismStatus === 'An toàn' ? 'bg-success' : 'bg-danger');
+
+    // Cập nhật Badge Tương quan
+    const relBadge = document.getElementById('relevantBadge');
+    relBadge.innerText = relevantTopicStatus;
+    relBadge.className = 'badge rounded-pill ' + 
+        (relevantTopicStatus === 'Tốt' ? 'bg-success' : 'bg-warning text-dark');
+}
+</script>
 </body>
 </html>

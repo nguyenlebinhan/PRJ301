@@ -1,7 +1,6 @@
 package dao;
 
 import dal.DBContext;
-import dto.StudentProfileRequestDTO;
 import model.Lecturer;
 import model.User;
 import java.sql.*;
@@ -232,7 +231,7 @@ public class LecturerDAO {
             lecturer.setCreatedAt(createdAt);
         }
         
-        // Set user info if available
+       
         try {
             String username = rs.getString("username");
             if (username != null) {
@@ -243,7 +242,7 @@ public class LecturerDAO {
                 lecturer.setUser(user);
             }
         } catch (SQLException e) {
-            // Ignore if columns don't exist
+            
         }
         
         return lecturer;

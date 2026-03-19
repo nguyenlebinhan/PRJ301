@@ -47,11 +47,12 @@
                         <th>Tài liệu & Mã nguồn</th>
                         <th style="width: 200px;">Độ tương đồng đạo văn</th>
                         <th>Trạng thái đạo văn</th>
-                        <th>Điểm tương quan giữa đề tài với bài luận án</th>
-                        <th>Tình trạng lạc đề</th>
-                        <th>AI(Check đạo văn/Lạc đề)</th>
-                        <th>AI(Gợi ý cải thiện)</th>
-                        
+                        <th style="width: 200px;">Điểm tương quan </th>
+                        <th style="width: 200px;">Tình trạng lạc đề</th>
+                        <th style="width: 200px;">AI phân tích</th>
+                        <th style="width: 200px;">AI(cải thiện)</th>
+                        <th style="width: 200px;">Điểm</th>
+                        <th style="width: 200px;">Feedback</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,13 +207,45 @@
                                         </div>
                                     </div>                                    
                                 </c:if>
+                            </td>  
+                            <td>
+                                <c:choose>
+                                    <c:when test="${not empty h.score}">
+                                        <span class="badge bg-primary fs-6">${h.score}/10</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="text-muted small italic">Chưa chấm</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <c:choose>
+                                        <c:when test="${not empty h.feedback}">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-info border-0 rounded-circle"
+                                                    data-bs-toggle="popover" 
+                                                    data-bs-trigger="focus" 
+                                                    data-bs-placement="top"
+                                                    title="<i class='fas fa-comment-dots me-2'></i>Nhận xét của giảng viên"
+                                                    data-bs-html="true"
+                                                    data-bs-content="<div class='small text-dark'>${h.feedback}</div>">
+                                                <i class="fas fa-comment-medical fs-5"></i>
+                                            </button>
+                                            <span class="ms-2 small text-muted d-none d-xl-inline">Có phản hồi</span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span class="text-muted opacity-50 small"><em>Chưa có</em></span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
                             </td>                            
                         </tr>
                     </c:forEach>
 
                     <c:if test="${empty historyList}">
                         <tr>
-                            <td colspan="5" class="text-center py-5">
+                            <td colspan="9" class="text-center py-5">
                                 <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" style="width: 80px;" class="mb-3 opacity-50">
                                 <p class="text-muted">Chưa có bản ghi nộp bài nào được tìm thấy.</p>
                             </td>
@@ -224,5 +257,15 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, { sanitize: false });
+        });
+    });
+</script>            
+
 </body>
 </html>

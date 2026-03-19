@@ -114,8 +114,6 @@ public class AdminController extends HttpServlet {
         }
     }
 
-    // --- CÁC HÀM XỬ LÝ CHI TIẾT ---
-
     private void displayAdminDashboard(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
         List<Student> student = studentDao.getAllStudents();
         List<Lecturer> lecturers = lecturerDao.getAllLecturers();
@@ -326,7 +324,7 @@ public class AdminController extends HttpServlet {
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         User existingUser = userDAO.getUserById(id);
-         // Để hiển thị dropdown chọn quyền
+         
         
         request.setAttribute("user", existingUser);
         request.getRequestDispatcher("/jsp/admin/user-form.jsp").forward(request, response);

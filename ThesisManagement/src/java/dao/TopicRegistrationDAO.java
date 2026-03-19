@@ -76,12 +76,12 @@ public class TopicRegistrationDAO {
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error getting Lecturer by mssv: " + mssv, e);
         }
-        return lecturer; // Trả về null nếu không tìm thấy, hoặc object nếu có dữ liệu
+        return lecturer; 
     }
     
     public List<StudentResponse> studentRegistered (String mscv){
         List<StudentResponse> studentList = new ArrayList<>();
-        String sql = "SELECT DISTINCT tr.mssv, s.fullName, s.gpa, s.major, s.className, s.email FROM TopicRegistrations tr INNER JOIN Students s ON s.mssv = tr.mssv WHERE tr.mscvHD = ? AND tr.status = 'ACCEPTED'";
+        String sql = "SELECT DISTINCT tr.mssv, s.fullName, s.gpa, s.major, s.className, s.email,s.phone,s.skills FROM TopicRegistrations tr INNER JOIN Students s ON s.mssv = tr.mssv WHERE tr.mscvHD = ? AND tr.status = 'ACCEPTED'";
         try (Connection conn = dbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             
@@ -95,7 +95,9 @@ public class TopicRegistrationDAO {
                     String major =rs.getString("major");
                     String className = rs.getString("className");
                     String email = rs.getString("email");
-                    studentList.add(new StudentResponse(mssv,fullName,gpa,major,className,email));
+                    String phone = rs.getString("phone");
+                    String skills = rs.getString("skills");
+                    studentList.add(new StudentResponse(mssv,fullName,email,gpa,phone,major,className,skills));
                     
                 }
             }
@@ -147,7 +149,6 @@ public class TopicRegistrationDAO {
     
     
     public boolean acceptedTopicRegistration(String mssv,String mscv, int topicId) {
-        // Câu lệnh SQL cập nhật trạng thái từ 'PENDING' sang 'ACCEPTED'
         String sql = "UPDATE TopicRegistrations SET status = 'ACCEPTED' " +
                      "WHERE mssv = ? AND topicId = ? AND mscvHD = ? AND status = 'PENDING'";
 

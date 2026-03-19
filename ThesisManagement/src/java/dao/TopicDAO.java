@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Data Access Object cho Topic
- */
+
 public class TopicDAO {
     private static final Logger LOGGER = Logger.getLogger(TopicDAO.class.getName());
     private final DBContext dbContext;
@@ -146,33 +144,10 @@ public class TopicDAO {
         return topics;
     }
 
-//    public List<Topic> getTopicsByLecturer(String mscv) {
-//        List<Topic> topics = new ArrayList<>();
-//        String sql = "SELECT t.*, l.fullName as lecturerName, l.researchField "
-//                + "FROM Topics t "
-//                + "LEFT JOIN Lecturers l ON t.createdBy = l.mscv "
-//                + "WHERE t.createdBy = ? "
-//                + "ORDER BY t.createdAt DESC";
-//        
-//        try (Connection conn = dbContext.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//            
-//            ps.setString(1, mscv);
-//            
-//            try (ResultSet rs = ps.executeQuery()) {
-//                while (rs.next()) {
-//                    topics.add(mapTopic(rs));
-//                }
-//            }
-//        } catch (SQLException e) {
-//            LOGGER.log(Level.SEVERE, "Error getting topics by lecturer: " + mscv, e);
-//        }
-//        return topics;
-//    }
     public List<TopicResponseDTO> getPendingRegistrations(String mscv) {
         List<TopicResponseDTO> list = new ArrayList<>();
 
-        // Thêm khoảng trắng trước WHERE và thêm topicId để xử lý Approve sau này
+        
         String sql = "SELECT s.fullName, s.mssv, t.topicId, t.title, tr.registeredAt " +
                      "FROM TopicRegistrations tr " +
                      "INNER JOIN Topics t ON t.topicId = tr.topicId " +
@@ -304,7 +279,7 @@ public class TopicDAO {
     
     public List<Topic> searchTopics(String keyword) {
         List<Topic> list = new ArrayList<>();
-        // Tìm theo tiêu đề đề tài HOẶC tên giảng viên
+        
         String sql = "SELECT t.* from Topics t WHERE t.title LIKE ? ";
 
         try (Connection conn = dbContext.getConnection();
@@ -359,7 +334,6 @@ public class TopicDAO {
         }
         topic.setDifficultyScore(rs.getBigDecimal("difficultyScore"));
         
-        // Set lecturer info if available
         try {
             String lecturerName = rs.getNString("lecturerName");
             if (lecturerName != null) {

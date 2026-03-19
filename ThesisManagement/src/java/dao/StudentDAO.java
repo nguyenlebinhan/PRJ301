@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * Data Access Object cho Student
- */
+
 public class StudentDAO {
     private static final Logger LOGGER = Logger.getLogger(StudentDAO.class.getName());
     private final DBContext dbContext;
@@ -147,37 +145,15 @@ public class StudentDAO {
     
     
     public boolean updateFullProfile(StudentProfileRequestDTO student) {
-        String sqlUser = "UPDATE Users SET fullName = ? WHERE id = (SELECT userId FROM Students WHERE mssv = ?)";
-        String sqlStudent = "UPDATE Students SET fullName = ?, className = ?, major = ?, skills = ?, email = ?, phone = ? WHERE mssv = ?";
+        String sqlStudent = "UPDATE Students SET phone = ? WHERE mssv = ?";
 
-        Connection conn = null;
-        try {
-            conn = dbContext.getConnection();
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
-                psUser.setString(1, student.getFullName());
-                psUser.setString(2, student.getMssv());
-                psUser.executeUpdate();
-            }
-            try (PreparedStatement psStudent = conn.prepareStatement(sqlStudent)) {
-                psStudent.setString(1, student.getFullName());
-                psStudent.setString(2, student.getClassName());
-                psStudent.setString(3, student.getMajor());
-                psStudent.setString(4, student.getSkills());
-                psStudent.setString(5, student.getEmail());
-                psStudent.setString(6, student.getPhone());
-                psStudent.setString(7, student.getMssv());
-                psStudent.executeUpdate();
-            }
-
-            conn.commit(); 
-            return true;
-        } catch (SQLException e) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
-            }
-            e.printStackTrace();
+        try (Connection conn = dbContext.getConnection();
+                PreparedStatement psStudent = conn.prepareStatement(sqlStudent)) {
+            psStudent.setString(1, student.getPhone());
+            psStudent.setString(2, student.getMssv());
+            return psStudent.executeUpdate()>0;         
+        }catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating student's profile", e);
             return false;
         }
     }    

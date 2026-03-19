@@ -1,7 +1,7 @@
 package controller;
 
 import dao.*;
-import dto.AppointmentResponse;
+import dto.ScoreUpdateRequest;
 import dto.StudentProgressDTO;
 import dto.StudentResponse;
 import dto.ThesisHistoryResponse;
@@ -121,6 +121,9 @@ public class LecturerController extends HttpServlet {
                 case "/profile/deactivate":
                     handleDeactiveUser(request,response,user);
                     break;
+                case "/score":
+                    handleScoreStudent(request,response,user);
+                    break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);
                     break;
@@ -167,14 +170,20 @@ public class LecturerController extends HttpServlet {
     private void listMyTopics(HttpServletRequest request, HttpServletResponse response, User user) 
             throws ServletException, IOException {
         Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
-        List<Topic> topics = topicDAO.getAllTopics();
+        String query = request.getParameter("query");
+        List<Topic> list;
+
+        if (query != null && !query.trim().isEmpty()) {
+            list = topicDAO.searchTopics(query.trim());
+        } else {
+            list = topicDAO.getAllTopics();
+        }
         request.setAttribute("lecturer", lecturer);
-        request.setAttribute("topics", topics);
+        request.setAttribute("topics", list);
         request.getRequestDispatcher("/jsp/lecturer/topic-manage.jsp").forward(request, response);
     }
     private void showStudentThesisHistory(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String mssv =request.getParameter("mssv");
-            // Gọi DAO lấy danh sách lịch sử
         List<ThesisHistoryResponse> historyList = thesisHistoryDAO.getThesisHistoryByMssv(mssv);
         ThesisHistoryResponse th = thesisHistoryDAO.getNameAndtopicCodeByMssv(mssv);
         Student student = studentDao.getStudentByMssv(mssv);
@@ -317,36 +326,46 @@ public class LecturerController extends HttpServlet {
         
         request.getRequestDispatcher("/jsp/lecturer/guided-student-list.jsp").forward(request, response);        
     }    
-
-
-   
+    private void handleScoreStudent(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException, IOException {
+        Double score = Double.valueOf(request.getParameter("studentScore"));
+        String feedback = request.getParameter("feedback");
+        int thesisId = Integer.parseInt(request.getParameter("thesisId"));
+        boolean isSuccess = thesisDAO.updateScoreInThesis(new ScoreUpdateRequest(thesisId,score,feedback));
+        if(isSuccess){
+            thesisHistoryDAO.updateScoreInThesisHistory(new ScoreUpdateRequest(thesisId,score,feedback));
+            request.getSession().setAttribute("success", "Đã chấm điểm thành công");
+            request.getSession().setAttribute("score", score);
+            request.getSession().setAttribute("feedback", feedback);
+            response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=add_success");
+        }else{
+            request.getSession().setAttribute("error", "Không thể thêm điểm");
+            response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=add_fail");
+        }
+        
+    }
     private void acceptTopic(HttpServletRequest request, HttpServletResponse response, User user) 
             throws ServletException, IOException {
         try {
-            // 1. Lấy thông tin cơ bản
+           
             Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
             String studentId = request.getParameter("studentId");
             int topicId = Integer.parseInt(request.getParameter("topicId"));
 
-            // 2. KIỂM TRA GIỚI HẠN TRƯỚC (Pre-check)
-            // Giả sử class Lecturer có thuộc tính currentStudents
             if (lecturer.getCurrentStudents() >= 5) {
                 response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=limit_reached");
                 return;
             }
 
-            // 3. Thực hiện chấp nhận đăng ký
+
             boolean isSuccess = registrationDAO.acceptedTopicRegistration(studentId, lecturer.getMscv(), topicId);
 
             if (isSuccess) {
-                // 4. Cập nhật lại số lượng vào bảng Lecturers
-                // Hàm này đã có điều kiện "AND currentStudents < 5" trong SQL nên rất an toàn
                 boolean updateCount = lecturerDao.updateNumberOfStudents(lecturer.getMscv());
 
                 if (updateCount) {
                     response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=approved");
                 } else {
-                    // Trường hợp hy hữu: Bị tranh chấp dữ liệu (Race condition)
+                    
                     response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=limit_reached");
                 }
             } else {
@@ -361,22 +380,22 @@ public class LecturerController extends HttpServlet {
     }
     private void rejectTopic(HttpServletRequest request, HttpServletResponse response, User user) throws ServletException,IOException {
         try {
-            // 1. Lấy thông tin từ Request và Session
+            
             Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
             String studentId = request.getParameter("studentId");
             int topicId = Integer.parseInt(request.getParameter("topicId"));
 
-            // 2. Gọi DAO để xử lý logic (Nên trả về boolean để kiểm tra thành công/thất bại)
+            
             boolean isSuccess = registrationDAO.rejectTopicRegistration(studentId, lecturer.getMscv(), topicId);
 
-            // 3. Điều hướng người dùng kèm theo thông báo trạng thái
+            
             if (isSuccess) {
                 response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=approved");
             } else {
                 response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=error");
             }
         } catch (Exception e) {
-            // Xử lý lỗi parse ID hoặc lỗi hệ thống
+            
             response.sendRedirect(request.getContextPath() + "/lecturer/dashboard?msg=system_error");
         }
     }    
@@ -387,7 +406,7 @@ public class LecturerController extends HttpServlet {
 
         try {
             Lecturer lecturer = lecturerDao.getLecturerByUserId(user.getId());
-            // Log thông tin bắt đầu hành động
+            
             LOGGER.log(Level.INFO,"Lecturer MSCV: {1} is attempting to create a new topic.",lecturer.getMscv());
             Topic topic = new Topic();
             topic.setTopicCode(request.getParameter("topicCode"));
@@ -395,7 +414,7 @@ public class LecturerController extends HttpServlet {
             topic.setDescription(request.getParameter("description"));
             topic.setTechnicalRequirements(request.getParameter("technicalRequirements"));
 
-            // Chú ý: Cần kiểm tra null/format cho BigDecimal để tránh Crash
+            
             String diffScore = request.getParameter("difficultyScore");
             topic.setDifficultyScore(new java.math.BigDecimal(diffScore));
 
@@ -403,7 +422,7 @@ public class LecturerController extends HttpServlet {
             topic.setType(request.getParameter("type"));
             topic.setCreatedBy(lecturer.getMscv());
 
-            // Log dữ liệu chuẩn bị insert (Dùng debug để tránh làm nặng log file ở môi trường Production)
+            
             LOGGER.log(Level.INFO,"Topic details: Code={1}, Title={2}", new Object[]{topic.getTopicCode(), topic.getTitle()});
 
             if (topicDAO.createTopic(topic)) {
@@ -436,7 +455,7 @@ public class LecturerController extends HttpServlet {
         topic.setTechnicalRequirements(request.getParameter("technicalRequirements"));
         topic.setStatus(request.getParameter("status"));
         topic.setDifficultyScore(new java.math.BigDecimal(request.getParameter("difficultyScore")));
-        topic.setCreatedBy(lecturer.getMscv()); // Để verify quyền sở hữu
+        topic.setCreatedBy(lecturer.getMscv()); 
 
         if (topicDAO.updateTopic(topic)) {
             response.sendRedirect(request.getContextPath() + "/lecturer/topics?msg=updated");
@@ -462,6 +481,5 @@ public class LecturerController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/lecturer/topics?error=invalid_id");
         }
     } 
-
 
 }

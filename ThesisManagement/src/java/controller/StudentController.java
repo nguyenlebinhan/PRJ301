@@ -137,6 +137,7 @@ public class StudentController extends HttpServlet {
                 break;
             case "/thesis/ai-advice":
                 handleImprovementThesis(request,response,user);
+                break;
             default:
                 //response.sendError(404);
                 break;
@@ -175,18 +176,12 @@ public class StudentController extends HttpServlet {
     
         if (thesisIdParam != null && !thesisIdParam.isEmpty()) {
             int thesisId = Integer.parseInt(thesisIdParam);
-
-            
             List<ThesisHistoryResponse> historyList = thesisHistoryDAO.getThesisHistory(student.getMssv(),thesisId);
             ThesisHistoryResponse th = thesisHistoryDAO.getNameAndtopicCode(student.getMssv(), thesisId);
-
-            
-            
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
             request.setAttribute("dateFormatter", formatter); 
             request.setAttribute("historyList", historyList);
             request.setAttribute("thesisInfo", th);
-            // Forward sang trang JSP mới (không phải Dashboard)
             request.getRequestDispatcher("/jsp/student/thesis-history.jsp").forward(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
@@ -195,13 +190,16 @@ public class StudentController extends HttpServlet {
     private void showTopicList(HttpServletRequest request, HttpServletResponse response,User user) 
             throws ServletException, IOException {
         Student student = studentDAO.getStudentByUserId(user.getId());
-
-   
-        List<Topic> topics = topicDao.getAvailableTopics();
-
         List<TopicRegistration> myRegistrations = topicRegistrationDao.getRegistrationsByStudent(student.getMssv());
+        String query = request.getParameter("query");
+        List<Topic> list;
 
-        request.setAttribute("topics", topics);
+        if (query != null && !query.trim().isEmpty()) {
+            list = topicDao.searchTopics(query.trim());
+        } else {
+            list = topicDao.getAllTopics();
+        }
+        request.setAttribute("topics", list);
         request.setAttribute("myRegistrations", myRegistrations);    
         request.getRequestDispatcher("/jsp/student/topic-list.jsp").forward(request, response);        
 
@@ -268,8 +266,7 @@ public class StudentController extends HttpServlet {
 
             String fileUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() 
                              + request.getContextPath() + "/uploads/" + fileName;
-
-            // 3. Gọi AI bằng URL của file vừa nộp
+            
             AIService aiService = new AIService();
             JsonObject plagiarismResult = aiService.checkPlagiarismAuto(fileUrl);
             JsonObject relevanceResult = aiService.checkTopicRelevant(fileUrl,topicName );
@@ -285,7 +282,22 @@ public class StudentController extends HttpServlet {
                 thesisId,fileUrl, request.getParameter("sourceCodeLink"),similarityScore,plagiarismStatus,bestSource,plagiarismAnalysis,relevantTopicScore,relevanceStatus,relevanceAnalysis
             );
 
-            thesisDAO.updateThesis(newThesis);
+            boolean isUpdatedSucessfully = thesisDAO.updateThesis(newThesis);
+            if(isUpdatedSucessfully){
+                thesisHistoryDAO.addToHistory(new Thesis(
+                thesisId, 
+                student.getMssv(), 
+                fileUrl, 
+                request.getParameter("sourceCodeLink"), 
+                similarityScore, 
+                plagiarismStatus, 
+                bestSource, 
+                plagiarismAnalysis, 
+                relevantTopicScore, 
+                relevanceStatus, 
+                relevanceAnalysis
+                ));
+            }
 
             request.getSession().setAttribute("success", "Upload và kiểm tra AI thành công!");
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
@@ -386,7 +398,10 @@ public class StudentController extends HttpServlet {
                 topPrior = topPriorElement.getAsString();
             }
             ImprovementRequest Iprequest = new ImprovementRequest(focusAnalysis,generalObservation,topPrior,userPrompt,thesisId);
-            thesisDAO.updateAnalysis(Iprequest);
+            boolean isUpdated = thesisDAO.updateAnalysis(Iprequest);
+            if(isUpdated){
+                thesisHistoryDAO.updateImprovementInThesisHistory(Iprequest);
+            }
             request.getSession().setAttribute("success", "AI cải tiến thành công!");
             response.sendRedirect(request.getContextPath() + "/student/dashboard");
         } catch (Exception e) {

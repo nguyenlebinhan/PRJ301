@@ -1,12 +1,8 @@
 package model;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Date;
 
-/**
- * Entity class cho bảng Theses
- */
+
 public class Thesis {
     private int thesisId;
     private String thesisCode;
@@ -24,10 +20,30 @@ public class Thesis {
     private double relevantTopicScore;
     private String relevantTopicStatus;
     private String relevanceAnalysis;
+    private double score;
+    private String feedback;
 
     public Thesis() {
     }
 
+    public Thesis(int thesisId, String mssv, String reportFile, String sourceCodeLink, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis) {
+        this.thesisId = thesisId;
+        this.mssv = mssv;
+        this.reportFile = reportFile;
+        this.sourceCodeLink = sourceCodeLink;
+        this.similarityScore = similarityScore;
+        this.plagiarismStatus = plagiarismStatus;
+        this.bestSource = bestSource;
+        this.plagiarismAnalysis = plagiarismAnalysis;
+        this.relevantTopicScore = relevantTopicScore;
+        this.relevantTopicStatus = relevantTopicStatus;
+        this.relevanceAnalysis = relevanceAnalysis;
+    }
+
+    
+
+    
+    
     public Thesis(int thesisId, String thesisCode, int topicId, String mssv, String mscvHD, String reportFile, String sourceCodeLink, String status, Date registeredAt) {
         this.thesisId = thesisId;
         this.thesisCode = thesisCode;
@@ -40,7 +56,7 @@ public class Thesis {
         this.registeredAt = registeredAt;
     }
 
-    public Thesis(int thesisId, String thesisCode, int topicId, String mssv, String mscvHD, String reportFile, String sourceCodeLink, String status, Date registeredAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis) {
+    public Thesis(int thesisId, String thesisCode, int topicId, String mssv, String mscvHD, String reportFile, String sourceCodeLink, String status, Date registeredAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis, double score, String feedback) {
         this.thesisId = thesisId;
         this.thesisCode = thesisCode;
         this.topicId = topicId;
@@ -57,15 +73,9 @@ public class Thesis {
         this.relevantTopicScore = relevantTopicScore;
         this.relevantTopicStatus = relevantTopicStatus;
         this.relevanceAnalysis = relevanceAnalysis;
+        this.score = score;
+        this.feedback = feedback;
     }
-
-
-
-
-    
-    
-
-
 
     public Thesis(int topicId, String mssv, String mscvHD, String reportFile, String sourceCodeLink, String status) {
         this.topicId = topicId;
@@ -76,7 +86,6 @@ public class Thesis {
         this.status = status;
     }
 
-    
     
 
     public int getThesisId() {
@@ -207,6 +216,22 @@ public class Thesis {
 
     public void setRelevanceAnalysis(String relevanceAnalysis) {
         this.relevanceAnalysis = relevanceAnalysis;
+    }
+
+    public double getScore() {
+        return score;
+    }
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
     }
     
     

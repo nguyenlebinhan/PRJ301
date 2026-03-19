@@ -17,7 +17,6 @@ public class EmailService {
     private static final Logger LOGGER = Logger.getLogger(EmailService.class.getName());
     private final ConfigManager config = ConfigManager.getInstance();
 
-    // Lấy thông tin từ ENV hoặc File thông qua ConfigManager
     private final String HOST = config.getProperty("EMAIL_HOST", "smtp.gmail.com");
     private final String PORT = config.getProperty("EMAIL_PORT", "587");
     private final String FROM_EMAIL = config.getProperty("EMAIL_FROM");
@@ -26,7 +25,6 @@ public class EmailService {
     
 
     public boolean sendEmail(String to, String subject, String body) {
-        // 1. SMTP Server Configuration
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
@@ -34,7 +32,6 @@ public class EmailService {
         props.put("mail.smtp.port", PORT);
         props.put("mail.mime.charset", "UTF-8");
 
-        // 2. Create Session
         Session session = Session.getInstance(props, new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -50,7 +47,7 @@ public class EmailService {
             message.setSubject(subject, "UTF-8");
             message.setContent(body, "text/html; charset=utf-8");            
 
-            // 4. Send Email
+            
             Transport.send(message);
             return true;
         } catch (MessagingException e) {

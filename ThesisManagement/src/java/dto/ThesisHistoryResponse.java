@@ -28,6 +28,8 @@ public class ThesisHistoryResponse {
     private String generalObservations;
     private String topPrior;
     private String aiRequestPrompt;
+    private double score;
+    private String feedback;
     private String title;
     private String topicCode;
 
@@ -54,7 +56,7 @@ public class ThesisHistoryResponse {
         this.createdAt = createdAt;
     }
 
-    public ThesisHistoryResponse(int historyId, int thesisId, String mssv, String reportFile, String sourceCodeLink, LocalDateTime createdAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis, String focusAnalysis, String generalObservations, String topPrior, String aiRequestPrompt, String title, String topicCode) {
+    public ThesisHistoryResponse(int historyId, int thesisId, String mssv, String reportFile, String sourceCodeLink, LocalDateTime createdAt, double similarityScore, String plagiarismStatus, String bestSource, String plagiarismAnalysis, double relevantTopicScore, String relevantTopicStatus, String relevanceAnalysis, String focusAnalysis, String generalObservations, String topPrior, String aiRequestPrompt, double score, String feedback, String title, String topicCode) {
         this.historyId = historyId;
         this.thesisId = thesisId;
         this.mssv = mssv;
@@ -72,9 +74,12 @@ public class ThesisHistoryResponse {
         this.generalObservations = generalObservations;
         this.topPrior = topPrior;
         this.aiRequestPrompt = aiRequestPrompt;
+        this.score = score;
+        this.feedback = feedback;
         this.title = title;
         this.topicCode = topicCode;
     }
+
 
     public String getAiRequestPrompt() {
         return aiRequestPrompt;
@@ -108,14 +113,26 @@ public class ThesisHistoryResponse {
         this.topPrior = topPrior;
     }
 
-    
+    public double getScore() {
+        return score;
+    }
 
+    public void setScore(double score) {
+        this.score = score;
+    }
+    
     public ThesisHistoryResponse(String title, String topicCode) {
         this.title = title;
         this.topicCode = topicCode;
     }
-    
-    
+
+    public String getFeedback() {
+        return feedback;
+    }
+
+    public void setFeedback(String feedback) {
+        this.feedback = feedback;
+    }
 
     public int getHistoryId() {
         return historyId;

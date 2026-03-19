@@ -25,11 +25,27 @@
             </div>
             <c:remove var="error" scope="session" />
         </c:if>        
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold"><i class="fas fa-list-ul me-2 text-primary"></i>Danh sách đề tài mở</h2>
-            <a href="${pageContext.request.contextPath}/student/dashboard" class="btn btn-outline-secondary">
-                <i class="fas fa-arrow-left me-1"></i> Quay lại Dashboard
-            </a>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+            <h2 class="fw-bold mb-0 order-1 order-md-2">
+                <i class="fas fa-list-ul me-2 text-primary"></i>Danh sách đề tài mở
+            </h2>
+            <div class="order-2 order-md-1">
+                <form action="${pageContext.request.contextPath}/student/topics" method="GET" class="search-box d-flex align-items-center border rounded-pill px-3 py-1">
+                    <i class="bi bi-search text-muted me-2"></i>
+                    <input type="text" 
+                           name="query" 
+                           value="${param.query}" 
+                           class="form-control border-0 shadow-none" 
+                           placeholder="Tìm tên đề tài ..."
+                           style="background: transparent;">
+                    <button type="submit" class="visually-hidden">Tìm</button>
+                </form>
+            </div>
+            <div class="order-3">
+                <a href="${pageContext.request.contextPath}/student/dashboard" class="btn btn-outline-secondary shadow-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại Dashboard
+                </a>
+            </div>
         </div>
 
         <c:set var="isAlreadyAccepted" value="false" />

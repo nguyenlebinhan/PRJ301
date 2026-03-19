@@ -24,6 +24,7 @@ public class DBInitializer {
                 + "isActive BIT DEFAULT 1) ";
         execute(conn, sql, "Users");
     }
+    
    
     
     private void createStudentsTable(Connection conn) throws SQLException {
@@ -94,7 +95,9 @@ public class DBInitializer {
                 + "focus_analysis NVARCHAR(MAX),"
                 + "general_observations NVARCHAR(MAX),"
                 + "top_three_prior NVARCHAR(MAX),"
-                + "aiRequestPrompt NVARCHAR(MAX)"
+                + "aiRequestPrompt NVARCHAR(MAX),"
+                + "score NVARCHAR(MAX),"
+                + "feedback NVARCHAR(MAX),"
                 + "FOREIGN KEY (topicId) REFERENCES Topics(topicId) ON DELETE CASCADE, "
                 + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE NO ACTION, "
                 + "FOREIGN KEY (mscvHD) REFERENCES Lecturers(mscv) ON DELETE NO ACTION) ";
@@ -137,7 +140,9 @@ public class DBInitializer {
                 + "focus_analysis NVARCHAR(MAX),"
                 + "general_observations NVARCHAR(MAX),"
                 + "top_three_prior NVARCHAR(MAX),"     
-                + "aiRequestPrompt NVARCHAR(MAX)"                
+                + "aiRequestPrompt NVARCHAR(MAX),"        
+                + "score NVARCHAR(MAX),"
+                + "feedback NVARCHAR(MAX),"                
                 + "FOREIGN KEY (mssv) REFERENCES Students(mssv) ON DELETE CASCADE, "                
                 + "FOREIGN KEY (thesisId) REFERENCES Theses(thesisId) ON DELETE NO ACTION) ";
         execute (conn,sql,"ThesisHistory");

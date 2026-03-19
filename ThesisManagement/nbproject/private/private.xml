@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/ThesisUpdateRequest.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/thesis-history.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dal/DBContext.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AdminController.java</file>
@@ -14,6 +15,7 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/error/500.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/controller/AuthController.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/login.jsp</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dto/StudentResponse.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/dao/ResetTokenDAO.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/service/AIService.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/lecturer/thesis-history.jsp</file>
@@ -38,6 +40,7 @@
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/student/topic-registration.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/Appointment.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/index.html</file>
+            <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/src/java/model/ThesisHistory.java</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/WEB-INF/web.xml</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/auth/reset-password.jsp</file>
             <file>file:/C:/Users/ADMIN/Desktop/PRJ%20Final/ThesisManagement/web/jsp/admin/dashboard.jsp</file>

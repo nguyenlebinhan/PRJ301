@@ -13,23 +13,37 @@ import java.math.BigDecimal;
 public class StudentResponse {
     private String mssv;
     private String fullName;
+    private String email;
     private BigDecimal gpa;
+    private String phone;
     private String major;
     private String className;
-    private String email;
+    private String skills;
+    
 
     public StudentResponse() {
     }
 
-    public StudentResponse(String mssv, String fullName, BigDecimal gpa, String major, String className, String email) {
+    public StudentResponse(String mssv, String fullName, String email, BigDecimal gpa, String phone, String major, String className, String skills) {
         this.mssv = mssv;
         this.fullName = fullName;
+        this.email = email;
         this.gpa = gpa;
+        this.phone = phone;
         this.major = major;
         this.className = className;
-        this.email = email;
+        this.skills = skills;
     }
 
+
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 
 
     public String getMssv() {
@@ -78,6 +92,14 @@ public class StudentResponse {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
     }
     
     

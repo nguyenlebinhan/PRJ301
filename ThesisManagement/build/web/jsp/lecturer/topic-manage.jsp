@@ -9,11 +9,30 @@
 </head>
 <body class="bg-light">
     <div class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-primary"><i class="fas fa-book-open me-2"></i>Kho Đề tài của Tôi</h2>
-            <a href="${pageContext.request.contextPath}/lecturer/dashboard" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left me-1"></i> Quay lại Dashboard
-            </a>            
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <h2 class="fw-bold text-primary mb-0">
+                <i class="fas fa-book-open me-2"></i>Kho Đề tài của Tôi
+            </h2>
+
+            <div class="flex-grow-1 mx-md-4" style="max-width: 400px;">
+                <form action="${pageContext.request.contextPath}/lecturer/topics" method="GET" 
+                      class="search-box d-flex align-items-center border rounded-pill px-3 py-1 bg-light">
+                    <i class="bi bi-search text-muted me-2"></i>
+                    <input type="text" 
+                           name="query" 
+                           value="${param.query}" 
+                           class="form-control border-0 shadow-none bg-transparent" 
+                           placeholder="Tìm tên đề tài..."
+                           aria-label="Search">
+                    <button type="submit" class="visually-hidden">Tìm</button>
+                </form>
+            </div>
+
+            <div class="text-end">
+                <a href="${pageContext.request.contextPath}/lecturer/dashboard" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại Dashboard
+                </a>
+            </div>
         </div>
 
         <div class="card shadow-sm border-0">

@@ -63,6 +63,13 @@
                                             onclick="prepareEmailModal('${s.mssv}', '${s.fullName}', '${s.email}')">
                                         <i class="fas fa-envelope"></i>
                                     </button>
+                                    <button class="btn btn-sm btn-outline-primary" 
+                                            title="Xem thông tin sinh viên" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#viewStudentModal"
+                                            onclick="prepareViewStudentModal('${s.mssv}', '${s.fullName}', '${s.email}', '${s.className}', '${s.major}', '${s.gpa}', '${s.phone}', '${s.skills}')">
+                                        <i class="fas fa-eye"></i>
+                                    </button>                                      
                                     <button class="btn btn-sm btn-outline-warning" 
                                         title="Chỉnh sửa GPA" 
                                         data-bs-toggle="modal" 
@@ -82,6 +89,61 @@
                 </tbody>
             </table>
         </div>
+        <div class="modal fade" id="viewStudentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg"> <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title fw-bold"><i class="fas fa-user-graduate me-2"></i>Chi tiết hồ sơ sinh viên</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-4">
+                            <div class="col-md-6 border-end">
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Họ và Tên</label>
+                                    <span id="m-name" class="fw-bold fs-5 text-primary"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Mã số sinh viên (MSSV)</label>
+                                    <span id="m-mssv" class="fw-bold"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Lớp chuyên ngành</label>
+                                    <span id="m-class" class="fw-bold text-secondary"></span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Chuyên ngành</label>
+                                    <span id="m-major" class="fw-bold text-info"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Điểm GPA tích lũy</label>
+                                    <span id="m-gpa" class="badge bg-success"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Số điện thoại</label>
+                                    <span id="m-phone" class="fw-bold"></span>
+                                </div>
+                            </div>
+
+                            <hr class="my-2">
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="text-muted small d-block">Địa chỉ Email</label>
+                                    <span id="m-email" class="fw-bold"></span>
+                                </div>
+                                <div class="mb-1">
+                                    <label class="text-muted small d-block">Kỹ năng chuyên môn</label>
+                                    <div id="m-skills" class="mt-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>        
         <div class="modal fade" id="editGpaModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -171,6 +233,29 @@
         document.getElementById('modalStudentName').innerText = name;
         document.getElementById('modalGpa').value = currentGpa;
     }
+    function prepareViewStudentModal(mssv, name, email, className, major, gpa, phone, skills) {
+        document.getElementById('m-mssv').innerText = mssv;
+        document.getElementById('m-name').innerText = name;
+        document.getElementById('m-email').innerText = email;
+        document.getElementById('m-class').innerText = className;
+        document.getElementById('m-major').innerText = major;
+        document.getElementById('m-gpa').innerText = gpa + " / 4.0";
+        document.getElementById('m-phone').innerText = phone || 'Chưa cập nhật';
+
+        // Xử lý hiển thị kỹ năng dạng Badge cho đẹp
+        const skillContainer = document.getElementById('m-skills');
+        skillContainer.innerHTML = ''; // Reset cũ
+        if (skills && skills.trim() !== "") {
+            skills.split(',').forEach(skill => {
+                let span = document.createElement('span');
+                span.className = "badge bg-info text-dark me-1";
+                span.innerText = skill.trim();
+                skillContainer.appendChild(span);
+            });
+        } else {
+            skillContainer.innerHTML = '<span class="text-muted small">Chưa có dữ liệu</span>';
+        }
+    }    
 </script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

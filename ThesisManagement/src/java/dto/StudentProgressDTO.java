@@ -10,6 +10,8 @@ package dto;
  */
 public class StudentProgressDTO {
     private String fullName;
+    private String mssv;
+    private int thesisId;
     private String reportFile;
     private String sourceCodeLink;
     private int similarityScore;
@@ -21,8 +23,10 @@ public class StudentProgressDTO {
     public StudentProgressDTO() {
     }
 
-    public StudentProgressDTO(String fullName, String reportFile, String sourceCodeLink, int similarityScore, String plagiarismStatus, String bestSource, double relevantTopicScore, String relevantTopicStatus) {
+    public StudentProgressDTO(String fullName, String mssv, int thesisId, String reportFile, String sourceCodeLink, int similarityScore, String plagiarismStatus, String bestSource, double relevantTopicScore, String relevantTopicStatus) {
         this.fullName = fullName;
+        this.mssv = mssv;
+        this.thesisId = thesisId;
         this.reportFile = reportFile;
         this.sourceCodeLink = sourceCodeLink;
         this.similarityScore = similarityScore;
@@ -31,6 +35,7 @@ public class StudentProgressDTO {
         this.relevantTopicScore = relevantTopicScore;
         this.relevantTopicStatus = relevantTopicStatus;
     }
+
 
 
 
@@ -98,8 +103,21 @@ public class StudentProgressDTO {
     public void setRelevantTopicStatus(String relevantTopicStatus) {
         this.relevantTopicStatus = relevantTopicStatus;
     }
-    
-    
-    
+
+    public String getMssv() {
+        return mssv;
+    }
+
+    public void setMssv(String mssv) {
+        this.mssv = mssv;
+    }
+
+    public int getThesisId() {
+        return thesisId;
+    }
+
+    public void setThesisId(int thesisId) {
+        this.thesisId = thesisId;
+    }
     
 }
